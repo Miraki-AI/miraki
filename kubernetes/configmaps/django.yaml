@@ -4,7 +4,7 @@ metadata:
   namespace: prod
   name: envs-prod-django
 data:
-  DJANGO_SETTINGS_MODULE: "config.settings.local"
+  DJANGO_SETTINGS_MODULE: "config.settings.production"
   DJANGO_ALLOWED_HOSTS: "*"
   DJANGO_SECURE_SSL_REDIRECT: "no"
   DJANGO_ACCOUNT_ALLOW_REGISTRATION: "no"
