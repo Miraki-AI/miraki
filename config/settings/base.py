@@ -50,11 +50,11 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 DATABASES = {
     "default":{
         "ENGINE": "django_tenants.postgresql_backend",
-        "NAME": "miraki_db",
-        "USER": "wrrVUrMZwLurzgXYAZJJQRFzwqrEKrps",
-        "PASSWORD": "bW3xjpNodVl3frNY8YgwGHkquUzF4DtAzbEb5ahSpBVP1MLFrbc74f5a7sJ2r3Nr",
-        "HOST": "postgres",
-        "PORT": "5432",
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env("POSTGRES_PORT"),
         
         }
     }
