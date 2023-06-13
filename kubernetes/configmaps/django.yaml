@@ -19,6 +19,7 @@ data:
   DJANGO_AWS_SECRET_ACCESS_KEY: 1L9BwySMEs7O9GmTfqX4uFQ8r1PDzMQO2Fc89XPj
   DJANGO_AWS_STORAGE_BUCKET_NAME: miraki-miraki
   MENTO_FRONTEND_URL: http://mento.miraki.ai
+  SENTRY_DSN: ""
   # # Email
   # # ------------------------------------------------------------------------------
   # DJANGO_SERVER_EMAIL: 
