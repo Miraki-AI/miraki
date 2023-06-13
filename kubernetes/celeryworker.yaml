@@ -34,10 +34,4 @@ spec:
             value: $(REDIS_URL)
           - name: DATABASE_URL
             value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
-        readinessProbe:
-          exec:
-            command: ["bash", "-c", "celery inspect ping -A config.celery_app -d celery@$HOSTNAME"]
-          initialDelaySeconds: 30
-          periodSeconds: 60
-          successThreshold: 10
       restartPolicy: Always

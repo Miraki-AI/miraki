@@ -6,5 +6,6 @@ metadata:
 data:
   POSTGRES_HOST: postgres
   POSTGRES_PORT: "5432"
-  POSTGRES_DB: miraki
-  POSTGRES_USER: debug
+  POSTGRES_DB: miraki_db
+  POSTGRES_USER: wrrVUrMZwLurzgXYAZJJQRFzwqrEKrps
+  POSTGRES_PASSWORD: KStxVuwLKu6wMsFUw5VE71FSGPsyUjHsuG0yfLMKT1Mj6w1k16Ntr1epVOrbb4OD
