@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     service: celeryflower
-  namespace: miraki-production
+  namespace: prod
   name: celeryflower  # name should be anything put flower: https://github.com/mher/flower/issues/738
 spec:
   replicas: 1
@@ -20,13 +20,13 @@ spec:
         - /start-flower
         envFrom:
           - configMapRef:
-              name: envs-miraki-production-django
+              name: envs-prod-django
           - configMapRef:
-              name: envs-miraki-production-postgres
+              name: envs-prod-postgres
           - secretRef:
-              name: secrets-miraki-production-django
+              name: secrets-prod-django
           - secretRef:
-              name: secrets-miraki-production-postgres
+              name: secrets-prod-postgres
         image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_flower:{CIRCLE_BUILD_NUM}
         name: celeryflower
         ports:
@@ -40,7 +40,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: celeryflower
-  namespace: miraki-production
+  namespace: prod
   labels:
     service: celeryflower
 spec:

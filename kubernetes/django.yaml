@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     service: django
-  namespace: miraki-production
+  namespace: prod
   name: django
 spec:
   replicas: 1
@@ -25,13 +25,13 @@ spec:
             containerPort: 5000
         envFrom:
           - configMapRef:
-              name: envs-miraki-production-django
+              name: envs-prod-django
           - configMapRef:
-              name: envs-miraki-production-postgres
+              name: envs-prod-postgres
           - secretRef:
-              name: secrets-miraki-production-django
+              name: secrets-prod-django
           - secretRef:
-              name: secrets-miraki-production-postgres
+              name: secrets-prod-postgres
         env:
           - name: CELERY_BROKER_URL
             value: $(REDIS_URL)
@@ -44,7 +44,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: miraki-production
+  namespace: prod
   name: django
   labels:
     service: django

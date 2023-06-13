@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     service: celerybeat
-  namespace: miraki-production
+  namespace: prod
   name: celerybeat
 spec:
   replicas: 1
@@ -20,13 +20,13 @@ spec:
         - /start-celerybeat
         envFrom:
         - configMapRef:
-            name: envs-miraki-production-django
+            name: envs-prod-django
         - configMapRef:
-            name: envs-miraki-production-postgres
+            name: envs-prod-postgres
         - secretRef:
-            name: secrets-miraki-production-django
+            name: secrets-prod-django
         - secretRef:
-            name: secrets-miraki-production-postgres
+            name: secrets-prod-postgres
         image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celerybeat:{CIRCLE_BUILD_NUM}
         name: celerybeat
       restartPolicy: Always

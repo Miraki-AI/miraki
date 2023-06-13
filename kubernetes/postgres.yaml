@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   labels:
     service: postgres
-  namespace: miraki-production
+  namespace: prod
   name: postgres
 spec:
   selector:
@@ -18,9 +18,9 @@ spec:
       containers:
       - envFrom:
           - configMapRef:
-              name: envs-miraki-production-postgres
+              name: envs-prod-postgres
           - secretRef:
-              name: secrets-miraki-production-postgres
+              name: secrets-prod-postgres
         image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_postgres:{CIRCLE_BUILD_NUM}
         name: postgres
         ports:
@@ -34,14 +34,14 @@ spec:
       volumes:
       - name: postgresdb
         persistentVolumeClaim:
-          claimName: postgres-pvc-claim-miraki-production
+          claimName: postgres-pvc-claim-prod
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     service: postgres
-  namespace: miraki-production
+  namespace: prod
   name: postgres
 spec:
   ports:

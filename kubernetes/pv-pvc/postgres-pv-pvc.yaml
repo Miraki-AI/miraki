@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-volume-miraki-production
-  namespace: miraki-production
+  name: postgres-pv-volume-prod
+  namespace: prod
 spec:
   storageClassName: manual
   capacity:
@@ -16,8 +16,8 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc-claim-miraki-production
-  namespace: miraki-production
+  name: postgres-pvc-claim-prod
+  namespace: prod
 spec:
   storageClassName: manual
   accessModes:
