@@ -20,6 +20,7 @@ data:
   DJANGO_AWS_STORAGE_BUCKET_NAME: miraki-miraki
   MENTO_FRONTEND_URL: http://mento.miraki.ai
   SENTRY_DSN: ""
+  DJANGO_SERVER_EMAIL: ""
   # # Email
   # # ------------------------------------------------------------------------------
   # DJANGO_SERVER_EMAIL: 
