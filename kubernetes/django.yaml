@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: django
+  namespace: miraki-production
+  name: django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: django
+  template:
+    metadata:
+      labels:
+        service: django
+    spec:
+      containers:
+      - args:
+        - /start
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_api:{CIRCLE_BUILD_NUM}
+        name: django
+        ports:
+          - name: gunicorn
+            containerPort: 5000
+        envFrom:
+          - configMapRef:
+              name: envs-miraki-production-django
+          - configMapRef:
+              name: envs-miraki-production-postgres
+          - secretRef:
+              name: secrets-miraki-production-django
+          - secretRef:
+              name: secrets-miraki-production-postgres
+        env:
+          - name: CELERY_BROKER_URL
+            value: $(REDIS_URL)
+          - name: DATABASE_URL
+            value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+      restartPolicy: Always
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: miraki-production
+  name: django
+  labels:
+    service: django
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+    name: http
+  selector:
+    service: django

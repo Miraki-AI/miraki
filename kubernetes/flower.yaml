@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: celeryflower
+  namespace: miraki-production
+  name: celeryflower  # name should be anything put flower: https://github.com/mher/flower/issues/738
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: celeryflower
+  template:
+    metadata:
+      labels:
+        service: celeryflower
+    spec:
+      containers:
+      - args:
+        - /start-flower
+        envFrom:
+          - configMapRef:
+              name: envs-miraki-production-django
+          - configMapRef:
+              name: envs-miraki-production-postgres
+          - secretRef:
+              name: secrets-miraki-production-django
+          - secretRef:
+              name: secrets-miraki-production-postgres
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_flower:{CIRCLE_BUILD_NUM}
+        name: celeryflower
+        ports:
+          - containerPort: 5555
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: celeryflower
+  namespace: miraki-production
+  labels:
+    service: celeryflower
+spec:
+  ports:
+  - port: 5555
+    targetPort: 5555
+    name: http
+  selector:
+    service: celeryflower

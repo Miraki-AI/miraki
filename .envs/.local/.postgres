@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=miraki_db
+POSTGRES_USER=wrrVUrMZwLurzgXYAZJJQRFzwqrEKrps
+POSTGRES_PASSWORD=bW3xjpNodVl3frNY8YgwGHkquUzF4DtAzbEb5ahSpBVP1MLFrbc74f5a7sJ2r3Nr

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: celerybeat
+  namespace: miraki-production
+  name: celerybeat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: celerybeat
+  template:
+    metadata:
+      labels:
+        service: celerybeat
+    spec:
+      containers:
+      - args:
+        - /start-celerybeat
+        envFrom:
+        - configMapRef:
+            name: envs-miraki-production-django
+        - configMapRef:
+            name: envs-miraki-production-postgres
+        - secretRef:
+            name: secrets-miraki-production-django
+        - secretRef:
+            name: secrets-miraki-production-postgres
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celerybeat:{CIRCLE_BUILD_NUM}
+        name: celerybeat
+      restartPolicy: Always

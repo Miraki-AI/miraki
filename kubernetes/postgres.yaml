@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    service: postgres
+  namespace: miraki-production
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      service: postgres
+  serviceName: "postgres"
+  template:
+    metadata:
+      labels:
+        service: postgres
+    spec:
+      containers:
+      - envFrom:
+          - configMapRef:
+              name: envs-miraki-production-postgres
+          - secretRef:
+              name: secrets-miraki-production-postgres
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_postgres:{CIRCLE_BUILD_NUM}
+        name: postgres
+        ports:
+          - containerPort: 5432
+            name: postgredb
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgresdb
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: postgresdb
+        persistentVolumeClaim:
+          claimName: postgres-pvc-claim-miraki-production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: postgres
+  namespace: miraki-production
+  name: postgres
+spec:
+  ports:
+  - name: "5432"
+    port: 5432
+  selector:
+    service: postgres
+status:
+  loadBalancer: {}

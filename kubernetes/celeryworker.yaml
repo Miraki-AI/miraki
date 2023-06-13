@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: celeryworker
+  namespace: miraki-production
+  name: celeryworker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: celeryworker
+  template:
+    metadata:
+      labels:
+        service: celeryworker
+    spec:
+      containers:
+      - name: celeryworker
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celeryworker:{CIRCLE_BUILD_NUM}
+        args:
+          - /start-celeryworker
+        envFrom:
+          - configMapRef:
+              name: envs-miraki-production-django
+          - configMapRef:
+              name: envs-miraki-production-postgres
+          - secretRef:
+              name: secrets-miraki-production-django
+          - secretRef:
+              name: secrets-miraki-production-postgres
+        env:
+          - name: CELERY_BROKER_URL
+            value: $(REDIS_URL)
+          - name: DATABASE_URL
+            value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)
+        readinessProbe:
+          exec:
+            command: ["bash", "-c", "celery inspect ping -A config.celery_app -d celery@$HOSTNAME"]
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 10
+      restartPolicy: Always

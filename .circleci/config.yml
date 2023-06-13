@@ -1,0 +1,63 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
+version: 2.1
+
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/configuration-reference/#jobs
+jobs:
+  say-hello:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello,lexus"
+
+  build_push_deploy_prod:
+    docker:
+      - image: cimg/python:3.10.5
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run: pip install awscli
+      - run:
+          name: "Configure AWS credentials"
+          command: |
+            aws configure set aws_access_key_id AKIATO76J2JT2D4VVSO7 && aws configure set aws_secret_access_key 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 && aws configure set default.region ap-south-1
+      - run:
+          name: "Build, push and deploy to prod"
+          command: |
+            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 238367134311.dkr.ecr.ap-south-1.amazonaws.com
+            cat production.yml | sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | docker-compose -f - build
+            cat production.yml | sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | docker-compose -f - push
+      - run:
+          name: "Deploy to prod"
+          command: |
+            sudo apt-get update
+            curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x kubectl
+            sudo mv kubectl /usr/local/bin
+            aws eks --region ap-south-1 update-kubeconfig --name eks-miraki
+            kubectl apply -f ./kubernetes/configmaps/django.yaml
+            kubectl apply -f ./kubernetes/configmaps/postgres.yaml
+            kubectl apply -f ./kubernetes/pv-pvc/postgres-pv-pvc.yaml
+            cat ./kubernetes/django.yaml |      sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f - 
+            cat ./kubernetes/postgres.yaml |    sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
+            cat ./kubernetes/celerybeat.yaml |  sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
+            cat ./kubernetes/celeryworker.yaml |sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
+            cat ./kubernetes/flower.yaml |      sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
+            cat ./kubernetes/redis.yaml |       sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
+            
+
+
+
+
+
+workflows:
+  build_push_deploy_workflow:
+    jobs:
+      - build_push_deploy_prod:
+          filters:
+            branches:
+              only: main
