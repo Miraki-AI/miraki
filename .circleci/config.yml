@@ -5,14 +5,6 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  say-hello:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello,lexus"
 
   build_push_deploy_prod:
     docker:
@@ -39,6 +31,8 @@ jobs:
             chmod +x kubectl
             sudo mv kubectl /usr/local/bin
             aws eks --region ap-south-1 update-kubeconfig --name eks-miraki
+            kubectl apply -f ./kubernetes/secrets/django.yaml
+            kubectl apply -f ./kubernetes/secrets/postgres.yaml
             kubectl apply -f ./kubernetes/configmaps/django.yaml
             kubectl apply -f ./kubernetes/configmaps/postgres.yaml
             kubectl apply -f ./kubernetes/pv-pvc/postgres-pv-pvc.yaml
