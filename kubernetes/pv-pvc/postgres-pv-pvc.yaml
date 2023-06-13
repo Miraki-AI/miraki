@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-pv-volume-prod
+  name: postgres-pv-volume-production
   namespace: prod
 spec:
   storageClassName: manual
@@ -10,13 +10,13 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/data/prod
+    path: /mnt/data/production
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc-claim-prod
+  name: postgres-pvc-claim-production
   namespace: prod
 spec:
   storageClassName: manual
