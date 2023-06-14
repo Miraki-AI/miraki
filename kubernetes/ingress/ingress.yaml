@@ -10,10 +10,10 @@ metadata:
   namespace: prod
 spec:
   rules:
-  - host: "trial-miraki.miraki.ai"
+  - host: "*.miraki.ai"
     http:
       paths:
-      - path: /backend
+      - path: /core
         pathType: Prefix
         backend:
           service:

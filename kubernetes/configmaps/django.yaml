@@ -20,6 +20,8 @@ data:
   DJANGO_AWS_S3_REGION_NAME: ap-south-1
   SENTRY_DSN: ""
   DJANGO_SERVER_EMAIL: ""
+  GODADDY_API_KEY: e5NFDRKrCwjN_RxQYrgc8wBxyUStV6yh77M
+  GODADDY_API_SECRET: BSfRu1fx6ATJ8AJycJvCc9
   # # Email
   # # ------------------------------------------------------------------------------
   # DJANGO_SERVER_EMAIL: 

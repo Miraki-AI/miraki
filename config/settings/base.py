@@ -102,7 +102,7 @@ THIRD_PARTY_APPS = [
 SHARED_APPS = [ 
                "django_tenants",
                "miraki.apps.customers",
-               "miraki.users",
+               
                
                
 ] + DJANGO_APPS + THIRD_PARTY_APPS
@@ -116,6 +116,7 @@ SHARED_APPS = [
 TENANT_APPS = [
     "miraki.apps.dashboard",
     "miraki.apps.hub_tenant",
+    "miraki.users",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
