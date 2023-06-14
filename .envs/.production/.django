@@ -4,7 +4,7 @@
 DJANGO_SETTINGS_MODULE=config.settings.production
 DJANGO_SECRET_KEY=w94vJ1lHdMtr48UpjZfLGws4TkgIJJRjqHtck4kUH7hVmCZKbGN2zemfWqDVyZM8
 DJANGO_ADMIN_URL=9PAiWbLHKMKSpX33sh8FaIcc5OHOSzak/
-DJANGO_ALLOWED_HOSTS=.miraki.ai
+DJANGO_ALLOWED_HOSTS="*"
 
 # Security
 # ------------------------------------------------------------------------------
@@ -41,8 +41,7 @@ REDIS_URL=redis://redis:6379/0
 
 # Celery
 # ------------------------------------------------------------------------------
-
+CELERY_BROKER_URL=redis://redis:6379/0
 # Flower
 CELERY_FLOWER_USER=TFXhkRbMMXnRowCgEGbSITqRtYkmJgwQ
-CELERY_FLOWER_PASSWORD=NNnN15gY902XR9HldrE5f2BPaNDyr6YrEao4oMKj2WgPSEvogAyoK49g7zndeuvk
-
+CELERY_FLOWER_PASSWORD=67pl1NAVD6ZFNt1HOkQ7R3ZjD9zdNi7PLJe5XlSUU5fT8e2VyMuo58wd305MARvx

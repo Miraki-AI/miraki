@@ -1,0 +1,52 @@
+version: '3'
+
+volumes:
+  miraki_production_postgres_data: {}
+  miraki_production_postgres_data_backups: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+
+    image: miraki_prod_api/django
+    depends_on:
+      - postgres
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+    ports:
+      - "8000:8000"
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: miraki_prod_postgres/postgres
+    volumes:
+      - miraki_production_postgres_data:/var/lib/postgresql/data:z
+      - miraki_production_postgres_data_backups:/backups:z
+    env_file:
+      - ./.envs/.production/.postgres
+
+
+  # redis:
+  #   image: redis:6
+
+  # celeryworker:
+  #   <<: *django
+  #   image: miraki_prod_celeryworker
+  #   command: /start-celeryworker
+
+  # celerybeat:
+  #   <<: *django
+  #   image: miraki_prod_celerybeat
+  #   command: /start-celerybeat
+
+  # flower:
+  #   <<: *django
+  #   image: miraki_prod_flower
+  #   command: /start-flower
+
