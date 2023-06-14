@@ -13,7 +13,7 @@ urlpatterns = [
     path("backend", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("backend/about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
     # Django Admin, use {% url 'admin:index' %}
-    path(settings.ADMIN_URL, admin.site.urls),
+    path("backend/"+settings.ADMIN_URL, admin.site.urls),
     # User management
     path("backend/users/", include("miraki.users.urls", namespace="users")),
     path("backend/accounts/", include("allauth.urls")),
