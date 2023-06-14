@@ -9,6 +9,9 @@
 from .base import *  # noqa
 from .base import env
 
+
+def get_current_domain(request):
+    return request.get_host()
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
@@ -187,7 +190,7 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
-    {"url": f"http://trial-miraki.miraki.ai", "description": "Production server"},
+    {"url": lambda request: f'http://{get_current_domain(request)}', "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
