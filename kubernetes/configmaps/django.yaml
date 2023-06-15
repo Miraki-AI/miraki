@@ -29,6 +29,7 @@ data:
   AWS_SES_SECRET_ACCESS_KEY: BIVcBqrG2G3QIQZFrIwmq3X0EYSTzRDqdFY6qoOLmNo1
   EMAIL_HOST: email-smtp.ap-south-1.amazonaws.com
   EMAIL_PORT: "587"
+  EMAIL_REGION: ap-south-1
 
   # # Email
   # # ------------------------------------------------------------------------------
