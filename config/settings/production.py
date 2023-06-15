@@ -100,17 +100,23 @@ MEDIA_URL = f"https://{aws_s3_domain}/media/"
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL",
-    default="miraki <noreply@miraki.ai>",
-)
-# https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX",
-    default="[miraki]",
-)
+# DEFAULT_FROM_EMAIL = env(
+#     "DJANGO_DEFAULT_FROM_EMAIL",
+#     default="miraki <noreply@miraki.ai>",
+# )
+# # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
+# SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+# # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
+# EMAIL_SUBJECT_PREFIX = env(
+#     "DJANGO_EMAIL_SUBJECT_PREFIX",
+#     default="[miraki]",
+# )
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env('AWS_SES_ACCESS_KEY_ID')
+EMAIL_HOST_PASSWORD = env('AWS_SES_SECRET_ACCESS_KEY')
+EMAIL_USE_TLS = True
+
 
 # ADMIN
 # ------------------------------------------------------------------------------
@@ -124,7 +130,7 @@ INSTALLED_APPS += ["anymail", "collectfast"]  # noqa: F405
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 # https://anymail.readthedocs.io/en/stable/esps/amazon_ses/
-EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 ANYMAIL = {}
 
 
