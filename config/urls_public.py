@@ -12,7 +12,7 @@ urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
     # Django Admin, use {% url 'admin:index' %}
-    path(settings.ADMIN_URL, admin.site.urls),
+    path('core/'+settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("miraki.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
@@ -25,12 +25,12 @@ if settings.DEBUG:
 # API URLS
 urlpatterns += [
     # API base url
-    path("api/", include("config.api_router")),
+    path("core/api/", include("config.api_router")),
     # DRF auth token
-    path("auth-token/", obtain_auth_token),
-    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path("core/auth-token/", obtain_auth_token),
+    path("core/api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
     path(
-        "api/docs/",
+        "core/api/docs/",
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
@@ -39,7 +39,7 @@ urlpatterns += [
 #APP API URLS
 
 urlpatterns += [
-    path("api/new-tenant/", TenantApiView.as_view(), name="new-tenant" ),
+    path("core/api/new-tenant/", TenantApiView.as_view(), name="new-tenant" ),
 ]
 
 
