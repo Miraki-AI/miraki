@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Onboarding Email</title>
+</head>
+<body>
+    <h1>Welcome to Our Platform!</h1>
+    <p>Dear {{ data.first_name}}  {{data.last_name}},</p>
+    <p>Thank you for joining our platform. We're excited to have you on board.</p>
+    <p>To activate your account, please click on the following link:</p>
+    <p><a href="{{ data.activation_url }}">Activate Account</a></p>
+    <p>If the above link doesn't work, you can copy and paste the following URL into your browser:</p>
+    <p>{{ data.activation_url }}</p>
+    <p>Best regards,</p>
+    <p>Your Platform Team</p>
+</body>
+</html>

@@ -26,9 +26,11 @@ CACHES = {
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = env("EMAIL_HOST", default="mailhog")
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = 1025
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env('AWS_SES_ACCESS_KEY_ID')
+EMAIL_HOST_PASSWORD = env('AWS_SES_SECRET_ACCESS_KEY')
+EMAIL_USE_TLS = True
 
 # WhiteNoise
 # ------------------------------------------------------------------------------

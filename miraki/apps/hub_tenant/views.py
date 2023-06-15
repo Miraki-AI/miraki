@@ -23,3 +23,4 @@ class CustomAuthToken(ObtainAuthToken):
             'email': user.email,
             'userprofile':userprofile
         })
+        

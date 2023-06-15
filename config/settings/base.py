@@ -376,3 +376,19 @@ SPECTACULAR_SETTINGS = {
 # ------------------------------------------------------------------------------
 
 SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
+AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
+AWS_SES_SECRET_ACCESS_KEY = env('AWS_SES_SECRET_ACCESS_KEY')
+AWS_SES_REGION_ENDPOINT = env('AWS_SES_REGION_ENDPOINT')
+AWS_SES_REGION_NAME = 'ap-south-1'
+# EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+
+#GODADDY
+
+GODADDY_API_KEY = env('GODADDY_API_KEY')
+GODADDY_API_SECRET = env('GODADDY_API_SECRET')
+GODADDY_DOMAIN = env('GODADDY_DOMAIN')
+ELB_URL = env('ELB_URL')

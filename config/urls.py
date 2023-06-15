@@ -8,6 +8,7 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 from miraki.apps.hub_tenant.views import CustomAuthToken
+from miraki.apps.customers.views import TenantApiView
 
 urlpatterns = [
     path("core", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -37,6 +38,11 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
+]
+
+# APP API URLS
+urlpatterns += [
+    path("core/api/new-tenant/", TenantApiView.as_view(), name="new-tenant" ),
 ]
 
 if settings.DEBUG:

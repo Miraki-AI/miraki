@@ -7,7 +7,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
-
+from miraki.apps.customers.views import TenantApiView
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
@@ -35,6 +35,13 @@ urlpatterns += [
         name="api-docs",
     ),
 ]
+
+#APP API URLS
+
+urlpatterns += [
+    path("api/new-tenant/", TenantApiView.as_view(), name="new-tenant" ),
+]
+
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
