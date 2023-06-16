@@ -108,19 +108,6 @@ class AreaSerializer(serializers.ModelSerializer):
 
 class SiteSerializer(serializers.ModelSerializer):
     areas = AreaSerializer(many=True, read_only=True)
-    organization = serializers.SerializerMethodField()
-    
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        org = OrganizationSerializer(Organization.objects.get(name='demo')).data
-        org['sites'] = [representation]
-        # return {
-        #     'org': org,
-        # }
-        return representation
-    
-    def get_organization(self, obj):
-        return 
     class Meta:
         model = Site
         fields = '__all__'
