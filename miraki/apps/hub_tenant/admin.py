@@ -1,77 +1,69 @@
 from django.contrib import admin
-from .models import Organization, Site, Area, Equipment, ControlSystem, Unit, ControlModule, DataPoint, \
-    Order, ProductionSchedule, ProcessData, Alarm, Event, ManufacturingFacility, UserProfile
-
+from .models import *
+from miraki.apps.customers.models import Organization
+from miraki.apps.hub_tenant.base.models import UserProfile
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ['id']
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ['id']
 
 
 @admin.register(Site)
 class SiteAdmin(admin.ModelAdmin):
-    list_display = ('name', 'organization')
+    list_display = ['id']
+
 
 
 @admin.register(Area)
 class AreaAdmin(admin.ModelAdmin):
-    list_display = ('name', 'site')
+    list_display = ['id']
 
 
-@admin.register(Equipment)
-class EquipmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'area')
+
+@admin.register(Line)
+class LineAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+    
+@admin.register(Process)
+class ProcessAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+    
+
+@admin.register(Machine)
+class MachineAdmin(admin.ModelAdmin):
+    list_display = ['id']
+
+    
+    
+@admin.register(PLC)
+class PLCAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name']
 
 
-@admin.register(ControlSystem)
-class ControlSystemAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+@admin.register(CNC)
+class CNCAdmin(admin.ModelAdmin):
+    list_display = ['id']
 
+    
+@admin.register(Robot)
+class RobotAdmin(admin.ModelAdmin):
+    list_display = ['id']
 
-@admin.register(Unit)
-class UnitAdmin(admin.ModelAdmin):
-    list_display = ('name', 'control_system')
+    
+@admin.register(Vision)
+class VisionAdmin(admin.ModelAdmin):
+    list_display = ['id']
 
+    
+@admin.register(AGV)
+class AGVAdmin(admin.ModelAdmin):
+    list_display = ['id']
 
-@admin.register(ControlModule)
-class ControlModuleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'unit')
-
-
-@admin.register(DataPoint)
-class DataPointAdmin(admin.ModelAdmin):
-    list_display = ('name', 'control_module')
-
-
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ('number',)
-
-
-@admin.register(ProductionSchedule)
-class ProductionScheduleAdmin(admin.ModelAdmin):
-    list_display = ('number', 'order')
-
-
-@admin.register(ProcessData)
-class ProcessDataAdmin(admin.ModelAdmin):
-    list_display = ('name', 'value', 'data_point')
-
-
-@admin.register(Alarm)
-class AlarmAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-
-
-@admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-
-
-@admin.register(ManufacturingFacility)
-class ManufacturingFacilityAdmin(admin.ModelAdmin):
-    list_display = ('organization', 'site', 'area', 'equipment', 'control_system', 'unit', 'control_module',
-                    'order', 'production_schedule', 'process_data', 'alarm', 'event')
+@admin.register(TagTopics)
+class TagTopicsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name']

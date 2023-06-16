@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/data/production
+    path: /mnt/data/production_v_1_0_0/postgres
 
 ---
 apiVersion: v1

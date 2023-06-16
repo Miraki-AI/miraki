@@ -12,6 +12,7 @@ from .serializers import *
 
 from godaddypy import Client, Account
 from celery import shared_task
+import time
 # `User = get_user_model()` is importing the user model defined in the Django project and assigning it
 # to the variable `User`. This allows the code to create a new user object using the `User` model
 # without having to hardcode the user model's name.
@@ -40,6 +41,7 @@ class Tenant:
             new_cname = self.create_cname_record()
             logging.info(f"CNAME record created: {new_cname}")
             
+            time.sleep(600)
             self.send_email()    
             
             return True
@@ -103,7 +105,7 @@ class Tenant:
     def send_email(self):
         try:
             template = get_template('email/user_onboard.html')
-            activation_url = f"https://{self.data['name']}.miraki.ai/core/api/tenant/activate?org_name={self.data['name']}&email={self.data['email']}"
+            activation_url = f"http://{self.data['name']}.miraki.ai/core/api/tenant/activate?org_name={self.data['name']}&email={self.data['email']}"
             self.data['activation_url'] = activation_url
             subject = 'Welcome to Our Platform - User Onboarding'
             html_message = template.render({'data': self.data})
