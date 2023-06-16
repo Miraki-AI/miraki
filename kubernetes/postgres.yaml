@@ -27,7 +27,7 @@ spec:
           - containerPort: 5432
             name: postgredb
         volumeMounts:
-        - mountPath: /var/lib/postgresql/data/v_1_0_0
+        - mountPath: /var/lib/postgresql/data
           name: postgresdb
       restartPolicy: Always
       serviceAccountName: ""

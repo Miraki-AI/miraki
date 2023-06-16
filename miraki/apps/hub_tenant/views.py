@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from django.shortcuts import render
 
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -6,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.authtoken.views import APIView
 from rest_framework import viewsets
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializer import UserProfileSerializer
 from .models import UserProfile
 from django.core.files.base import ContentFile
@@ -74,6 +76,19 @@ class SiteViewSet(viewsets.ModelViewSet):
         serializer = SiteSerializer(sites, many=True)
         return Response(serializer.data, status=200)
     
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='param_name',
+                address=str,
+                city=str,
+                country=str,
+                zipcode=str,
+                admin_users=List[str],
+                allowed_users=List[str],
+            ),
+        ],
+    )
     def create(self, request, *args, **kwargs):
         try:
             siteform = SiteForm(request.data)
