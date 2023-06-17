@@ -27,3 +27,5 @@ django-tenants
 djangorestframework-simplejwt==5.2.2
 django-ses
 godaddypy
+
+django-cors-headers==3.14.0  # https://github.com/adamchainz/django-cors-headers
