@@ -80,13 +80,32 @@ class SiteViewSet(viewsets.ModelViewSet):
         parameters=[
             OpenApiParameter(
                 name='param_name',
-                address=str,
-                city=str,
-                country=str,
-                zipcode=str,
-                admin_users=List[str],
-                allowed_users=List[str],
+                type=str
             ),
+            OpenApiParameter(
+                name='address',
+                type=str
+            ),
+            OpenApiParameter(
+                name='city',
+                type=str
+            ),
+            OpenApiParameter(
+                name='country',
+                type=str
+            ),
+            OpenApiParameter(
+                name='zipcode',
+                type=str
+            ),
+            OpenApiParameter(
+                name='allowed_users',
+                type=List[str]
+            ),
+            OpenApiParameter(
+                name='admin_users',
+                type=List[str]
+            )
         ],
     )
     def create(self, request, *args, **kwargs):
