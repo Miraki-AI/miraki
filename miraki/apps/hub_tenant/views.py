@@ -79,12 +79,11 @@ class SiteViewSet(viewsets.ModelViewSet):
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                name='param_name',
-                type=str
-            ),
-            OpenApiParameter(
                 name='address',
-                type=str
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description='Your parameter description',
+                enum=[],
             ),
             OpenApiParameter(
                 name='city',
@@ -100,11 +99,11 @@ class SiteViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter(
                 name='allowed_users',
-                type=List[str]
+                type=str
             ),
             OpenApiParameter(
                 name='admin_users',
-                type=List[str]
+                type=List
             )
         ],
     )
