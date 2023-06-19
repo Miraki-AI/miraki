@@ -396,11 +396,11 @@ GODADDY_DOMAIN = env('GODADDY_DOMAIN')
 ELB_URL = env('ELB_URL')
 
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:4200',  # Add your Angular development server URL here
-]
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:4200',  # Add your Angular development server URL here
+# ]
 CORS_ALLOW_METHODS = [
     'GET',
     'POST',
