@@ -2,8 +2,8 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
+orbs:
+  slack: circleci/slack@4.12.5
 jobs:
 
   build_push_deploy_prod:
@@ -43,7 +43,15 @@ jobs:
             cat ./kubernetes/flower.yaml |      sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
             cat ./kubernetes/redis.yaml |       sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
             
-
+      - slack/notify:
+          channel: C05BV0S9JBC
+          event: fail
+          mentions: '@EngineeringTeam'
+          template: basic_fail_1
+      - slack/notify:
+          channel: C05BV0S9JBC
+          event: pass
+          template: success_tagged_deploy_1
 
 
 
