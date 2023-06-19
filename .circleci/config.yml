@@ -44,14 +44,24 @@ jobs:
             cat ./kubernetes/redis.yaml |       sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
             
       - slack/notify:
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*This is a text notification*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
+          event: always
           channel: C05BV0S9JBC
-          event: fail
-          mentions: '@EngineeringTeam'
-          template: basic_fail_1
-      - slack/notify:
-          channel: C05BV0S9JBC
-          event: pass
-          template: success_tagged_deploy_1
+          mentions: '@channel'
 
 
 
@@ -63,3 +73,4 @@ workflows:
           filters:
             branches:
               only: main
+          context: slack-secrets
