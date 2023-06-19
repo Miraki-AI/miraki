@@ -103,7 +103,7 @@ class SiteViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter(
                 name='admin_users',
-                type=List
+                type={'type': 'array', 'items': {'type': 'string'}},
             )
         ],
     )
