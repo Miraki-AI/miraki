@@ -35,33 +35,31 @@ jobs:
             aws eks --region ap-south-1 update-kubeconfig --name eks-miraki
             echo Namespace -- << pipeline.parameters.EKS_NAMESPACE >>
             cat ./kubernetes/namespaces/production.yaml        | sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f -
-            cat ./kubernetes/secrets/django.yaml               | sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | kubectl apply -f -
-            cat ./kubernetes/secrets/postgres.yaml             | sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | kubectl apply -f -
-            cat ./kubernetes/configmaps/django.yaml            | sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | kubectl apply -f -
-            cat ./kubernetes/configmaps/postgres.yaml          | sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | kubectl apply -f -
-            cat ./kubernetes/pv-pvc/postgres-pv-pvc.yaml       | sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | kubectl apply -f -
+            cat ./kubernetes/secrets/django.yaml               | sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f -
+            cat ./kubernetes/secrets/postgres.yaml             | sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f -
+            cat ./kubernetes/configmaps/django.yaml            | sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f -
+            cat ./kubernetes/configmaps/postgres.yaml          | sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f -
+            cat ./kubernetes/pv-pvc/postgres-pv-pvc.yaml       | sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f -
 
 
-            cat ./kubernetes/namespaces/production.yaml |      sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | kubectl apply -f - 
-            cat ./kubernetes/django.yaml |                     sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g"  | sed "s/{IMAGE_TAG}/${{parameters.IMAGE_TAG}}/g" | kubectl apply -f - 
-            cat ./kubernetes/postgres.yaml |                   sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g" |  sed "s/{IMAGE_TAG}/${{parameters.IMAGE_TAG}}/g" | kubectl apply -f -
-            cat ./kubernetes/celerybeat.yaml |                 sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g" |  sed "s/{IMAGE_TAG}/${{parameters.IMAGE_TAG}}/g" | kubectl apply -f -
-            cat ./kubernetes/celeryworker.yaml |               sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g" |  sed "s/{IMAGE_TAG}/${{parameters.IMAGE_TAG}}/g" | kubectl apply -f -
-            cat ./kubernetes/flower.yaml |                     sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g" |  sed "s/{IMAGE_TAG}/${{parameters.IMAGE_TAG}}/g" | kubectl apply -f -
-            cat ./kubernetes/redis.yaml |                      sed "s/{EKS_NAMESPACE}/${{parameters.EKS_NAMESPACE}}/g" |  sed "s/{IMAGE_TAG}/${{parameters.IMAGE_TAG}}/g" | kubectl apply -f -
+            cat ./kubernetes/namespaces/production.yaml |      sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | kubectl apply -f - 
+            cat ./kubernetes/django.yaml |                     sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g"  | sed "s/{IMAGE_TAG}/<< pipeline.parameters.IMAGE_TAG >>/g" | kubectl apply -f - 
+            cat ./kubernetes/postgres.yaml |                   sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g" |  sed "s/{IMAGE_TAG}/<< pipeline.parameters.IMAGE_TAG >>/g" | kubectl apply -f -
+            cat ./kubernetes/celerybeat.yaml |                 sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g" |  sed "s/{IMAGE_TAG}/<< pipeline.parameters.IMAGE_TAG >>/g" | kubectl apply -f -
+            cat ./kubernetes/celeryworker.yaml |               sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g" |  sed "s/{IMAGE_TAG}/<< pipeline.parameters.IMAGE_TAG >>/g" | kubectl apply -f -
+            cat ./kubernetes/flower.yaml |                     sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g" |  sed "s/{IMAGE_TAG}/<< pipeline.parameters.IMAGE_TAG >>/g" | kubectl apply -f -
+            cat ./kubernetes/redis.yaml |                      sed "s/{EKS_NAMESPACE}/<< pipeline.parameters.EKS_NAMESPACE >>/g" |  sed "s/{IMAGE_TAG}/<< pipeline.parameters.IMAGE_TAG >>/g" | kubectl apply -f -
              
       - slack/notify:
-          channel: C05BV0S9JBC
+          channel: C05DBCM563U
           event: fail
           mentions: '@Channel'
           template: basic_fail_1
       - slack/notify:
-          channel: C05BV0S9JBC
+          channel: C05DBCM563U
           event: pass
           mentions: '@Channel'
           template: success_tagged_deploy_1
-
-
 
 
 workflows:
