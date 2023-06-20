@@ -21,7 +21,7 @@ spec:
               name: envs-{EKS_NAMESPACE}-postgres
           - secretRef:
               name: secrets-{EKS_NAMESPACE}-postgres
-        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_postgres:{CIRCLE_BUILD_NUM}
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_postgres:{IMAGE_TAG}
         name: postgres
         ports:
           - containerPort: 5432
@@ -51,3 +51,4 @@ spec:
     service: postgres
 status:
   loadBalancer: {}
+
