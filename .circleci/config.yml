@@ -69,6 +69,10 @@ jobs:
       - setup_remote_docker
       - run: pip install awscli
       - run:
+          name: "Configure AWS credentials"
+          command: |
+            aws configure set aws_access_key_id AKIATO76J2JT2D4VVSO7 && aws configure set aws_secret_access_key 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 && aws configure set default.region ap-south-1
+      - run:
           name: "Build and push image"
           command: |
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 238367134311.dkr.ecr.ap-south-1.amazonaws.com
