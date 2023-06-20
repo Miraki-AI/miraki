@@ -4,8 +4,16 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@4.12.5
-jobs:
 
+parameters:
+  EKS_NAMESPACE:
+    type: string
+    default: "miraki"
+  IMAGE_TAG:
+    type: string
+    default: "latest"
+
+jobs:
   build_push_deploy_prod:
     docker:
       - image: cimg/python:3.10.5
