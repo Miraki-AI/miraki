@@ -61,6 +61,29 @@ jobs:
           mentions: '@Channel'
           template: success_tagged_deploy_1
 
+  build_and_push_image:
+    docker:
+      - image: cimg/python:3.10.5
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build and push image"
+          command: |
+            echo "Building image" 
+            cat production.yml | sed "s/{IMAGE_TAG}/prod/g" | docker-compose -f - build
+            cat production.yml | sed "s/{IMAGE_TAG}/prod/g" | docker-compose -f - push
+      - slack/notify:
+          channel: C05BV0S9JBC
+          event: fail
+          mentions: '@Channel'
+          template: basic_fail_1
+      - slack/notify:
+          channel: C05BV0S9JBC
+          event: pass
+          mentions: '@Channel'
+          template: success_tagged_deploy_1
+
 
 workflows:
   build_push_deploy_workflow:
@@ -69,4 +92,9 @@ workflows:
           filters:
             branches:
               only: main
+          context: slack-secrets
+      - build_and_push_image:
+          filters:
+            branches:
+              only: production
           context: slack-secrets
