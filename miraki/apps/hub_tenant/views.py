@@ -76,6 +76,7 @@ class SiteViewSet(viewsets.ModelViewSet):
         serializer = SiteSerializer(sites, many=True)
         return Response(serializer.data, status=200)
     
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -99,7 +100,7 @@ class SiteViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter(
                 name='allowed_users',
-                type=str
+                type={'type': 'array', 'items': {'type': 'string'}},
             ),
             OpenApiParameter(
                 name='admin_users',

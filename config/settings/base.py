@@ -44,23 +44,23 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
-# DATABASES = {"default": env.db("DATABASE_URL")}
-# DATABASES["default"]["ATOMIC_REQUESTS"] = True
+DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
-DATABASES = {
-    "default":{
-        "ENGINE": "django_tenants.postgresql_backend",
-        "NAME": env("POSTGRES_DB"),
-        "USER": env("POSTGRES_USER"),
-        "PASSWORD": env("POSTGRES_PASSWORD"),
-        "HOST": env("POSTGRES_HOST"),
-        "PORT": env("POSTGRES_PORT"),
+# DATABASES = {
+#     "default":{
+#         "ENGINE": "django_tenants.postgresql_backend",
+#         "NAME": env("POSTGRES_DB"),
+#         "USER": env("POSTGRES_USER"),
+#         "PASSWORD": env("POSTGRES_PASSWORD"),
+#         "HOST": env("POSTGRES_HOST"),
+#         "PORT": env("POSTGRES_PORT"),
         
-        }
-    }
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
+#         }
+#     }
+# DATABASE_ROUTERS = (
+#     'django_tenants.routers.TenantSyncRouter',
+# )
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -69,7 +69,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "config.urls"
-PUBLIC_SCHEMA_URLCONF = "config.urls_public"
+# PUBLIC_SCHEMA_URLCONF = "config.urls_public"
 # https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -100,7 +100,6 @@ THIRD_PARTY_APPS = [
 ]
 
 SHARED_APPS = [ 
-               "django_tenants",
                "miraki.apps.customers",
                "miraki.users",
                
@@ -124,9 +123,9 @@ TENANT_APPS = [
 INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 
-TENANT_MODEL = "customers.Organization" # app.Model
+# TENANT_MODEL = "customers.Organization" # app.Model
 
-TENANT_DOMAIN_MODEL = "customers.Domain"  # app.Model
+# TENANT_DOMAIN_MODEL = "customers.Domain"  # app.Model
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
@@ -169,7 +168,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django_tenants.middleware.main.TenantMainMiddleware",
+    # "django_tenants.middleware.main.TenantMainMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -376,7 +375,7 @@ SPECTACULAR_SETTINGS = {
 # Your stuff...
 # ------------------------------------------------------------------------------
 
-SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
+# SHOW_PUBLIC_IF_NO_TENANT_FOUND = True
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
 AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
 AWS_SES_SECRET_ACCESS_KEY = env('AWS_SES_SECRET_ACCESS_KEY')

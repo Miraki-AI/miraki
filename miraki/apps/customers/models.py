@@ -1,5 +1,4 @@
 from django.db import models
-from django_tenants.models import TenantMixin, DomainMixin
 
 from miraki.apps.hub_tenant.base.models import UUIDTimeStampedModel
 
@@ -18,7 +17,7 @@ class Licence(UUIDTimeStampedModel):
     users_allowed = models.IntegerField(default=0)
     def __str__(self):
         return self.name
-class Organization(TenantMixin):
+class Organization(UUIDTimeStampedModel):
     name = models.CharField(max_length=100)
     paid_until =  models.DateField()
     on_trial = models.BooleanField()
@@ -26,8 +25,6 @@ class Organization(TenantMixin):
     # created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     license = models.OneToOneField(Licence, on_delete=models.CASCADE, blank=True, null=True)
     # default true, schema will be automatically created and synced when it is saved
-    auto_create_schema = True
-
-class Domain(DomainMixin):
-    pass
-
+    
+    def __str__(self):
+        return self.name

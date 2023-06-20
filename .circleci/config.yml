@@ -18,12 +18,6 @@ jobs:
           command: |
             aws configure set aws_access_key_id AKIATO76J2JT2D4VVSO7 && aws configure set aws_secret_access_key 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 && aws configure set default.region ap-south-1
       - run:
-          name: "Build, push and deploy to prod"
-          command: |
-            aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 238367134311.dkr.ecr.ap-south-1.amazonaws.com
-            cat production.yml | sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | docker-compose -f - build
-            cat production.yml | sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | docker-compose -f - push
-      - run:
           name: "Deploy to prod"
           command: |
             sudo apt-get update
@@ -31,17 +25,22 @@ jobs:
             chmod +x kubectl
             sudo mv kubectl /usr/local/bin
             aws eks --region ap-south-1 update-kubeconfig --name eks-miraki
-            kubectl apply -f ./kubernetes/secrets/django.yaml
-            kubectl apply -f ./kubernetes/secrets/postgres.yaml
-            kubectl apply -f ./kubernetes/configmaps/django.yaml
-            kubectl apply -f ./kubernetes/configmaps/postgres.yaml
-            kubectl apply -f ./kubernetes/pv-pvc/postgres-pv-pvc.yaml
-            cat ./kubernetes/django.yaml |      sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f - 
-            cat ./kubernetes/postgres.yaml |    sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
-            cat ./kubernetes/celerybeat.yaml |  sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
-            cat ./kubernetes/celeryworker.yaml |sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
-            cat ./kubernetes/flower.yaml |      sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
-            cat ./kubernetes/redis.yaml |       sed "s/{CIRCLE_BUILD_NUM}/${CIRCLE_BUILD_NUM}/g" | kubectl apply -f -
+            
+            cat ./kubernetes/namespaces/production.yaml        | sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f -
+            cat ./kubernetes/secrets/django.yaml               | sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f -
+            cat ./kubernetes/secrets/postgres.yaml             | sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f -
+            cat ./kubernetes/configmaps/django.yaml            | sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f -
+            cat ./kubernetes/configmaps/postgres.yaml          | sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f -
+            cat ./kubernetes/pv-pvc/postgres-pv-pvc.yaml       | sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f -
+
+
+            cat ./kubernetes/namespaces/production.yaml |      sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | kubectl apply -f - 
+            cat ./kubernetes/django.yaml |                     sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g"  | sed "s/{IMAGE_TAG}/${IMAGE_TAG}/g" | kubectl apply -f - 
+            cat ./kubernetes/postgres.yaml |                   sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g" |  sed "s/{IMAGE_TAG}/${IMAGE_TAG}/g" | kubectl apply -f -
+            cat ./kubernetes/celerybeat.yaml |                 sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g" |  sed "s/{IMAGE_TAG}/${IMAGE_TAG}/g" | kubectl apply -f -
+            cat ./kubernetes/celeryworker.yaml |               sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g" |  sed "s/{IMAGE_TAG}/${IMAGE_TAG}/g" | kubectl apply -f -
+            cat ./kubernetes/flower.yaml |                     sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g" |  sed "s/{IMAGE_TAG}/${IMAGE_TAG}/g" | kubectl apply -f -
+            cat ./kubernetes/redis.yaml |                      sed "s/{EKS_NAMESPACE}/${EKS_NAMESPACE}/g" |  sed "s/{IMAGE_TAG}/${IMAGE_TAG}/g" | kubectl apply -f -
              
       - slack/notify:
           channel: C05BV0S9JBC

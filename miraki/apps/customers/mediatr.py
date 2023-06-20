@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.template.loader import get_template
 from miraki.users.api.serializers import UserSerializer
-from .models import Organization, Domain
+from .models import Organization
 from miraki.apps.hub_tenant.models import UserProfile
 from .serializers import *
 

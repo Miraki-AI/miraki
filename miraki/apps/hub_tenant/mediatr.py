@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from miraki.apps.hub_tenant.models import *
 from miraki.apps.hub_tenant.base.models import UserProfile
 from miraki.apps.hub_tenant.serializer import *
-
+from miraki.apps.hub_tenant.permissions import Permissions
 User = get_user_model()
 class UserOnBoard:
     def __init__(self, request):
@@ -65,7 +65,11 @@ class ManageSite:
         self.data = request.data
         self.tenant = request.tenant
         self.request = request
+        self.userprofile = self.__get_user()
+        self.permissions = Permissions(self.userprofile)
+        
         logging.info(f"Manage Site request: {self.data}")
+        
     
     def __get_user(self):
         return UserProfile.objects.get(user=self.request.user)
@@ -76,34 +80,49 @@ class ManageSite:
         except Exception as e:
             raise Exception(f'Error in getting site by id - {str(e)}')
     
-    def create_site(self):
+    def get_site(self):
         try:
-            site = Site(
-                name=self.data['name'],
-                address=self.request.data['address'],
-                state=self.request.data['state'],
-                zipcode=self.request.data['zipcode'],
-                country=self.request.data['country'],
-                created_by=self.__get_user()
-                
-            )
-            site.save()
-            
-            if self.data.get('areas', None):
-                for area in self.data['areas']:
-                    site.areas.add(area)
-            
-            if self.data.get('allowed_users', None):
-                for user in self.data['allowed_users']:
-                    site.allowed_users.add(user)
-            if self.data.get('admin_users', None):
-                for user in self.data['admin_users']:
-                    site.admin_users.add(user)
-                    
-            serializer = SiteSerializer(site)
-            return serializer.data
+            if self.data.get('site_id', None):
+                site = self.get_site_instance_by_id(self.data['site_id'])
+                serializer = SiteSerializer(site)
+                return serializer.data
+            else:
+                sites = Site.objects.filter(created_by=self.userprofile)
+                serializer = SiteSerializer(sites, many=True)
+                return serializer.data
         except Exception as e:
-            raise Exception(f'Error in creating site - {str(e)}')
+            raise Exception(f'Error in getting site - {str(e)}')
+    
+    def create_site(self):
+        permissions = self.permissions.get_site_permissions()
+        logging.info(f"Permissions: {permissions}")        
+        # try:
+        #     site = Site(
+        #         name=self.data['name'],
+        #         address=self.request.data['address'],
+        #         state=self.request.data['state'],
+        #         zipcode=self.request.data['zipcode'],
+        #         country=self.request.data['country'],
+        #         created_by=self.__get_user()
+                
+        #     )
+        #     site.save()
+            
+        #     if self.data.get('areas', None):
+        #         for area in self.data['areas']:
+        #             site.areas.add(area)
+            
+        #     if self.data.get('allowed_users', None):
+        #         for user in self.data['allowed_users']:
+        #             site.allowed_users.add(user)
+        #     if self.data.get('admin_users', None):
+        #         for user in self.data['admin_users']:
+        #             site.admin_users.add(user)
+                    
+        #     serializer = SiteSerializer(site)
+        #     return serializer.data
+        # except Exception as e:
+        #     raise Exception(f'Error in creating site - {str(e)}')
     
     def delete_site(self, instance):
         try:

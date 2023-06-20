@@ -1,0 +1,26 @@
+kind: DatadogAgent
+apiVersion: datadoghq.com/v2alpha1
+metadata:
+  name: datadog
+spec:
+  features:
+    admissionController:
+      enabled: false
+    externalMetricsServer:
+      enabled: true
+      useDatadogMetrics: true
+    apm:
+      enabled: true
+      hostPortConfig:
+        enabled: true
+  global:
+    credentials:
+      apiKey: e2b1681fb57dec0dee2f21a412706ba6
+      appKey: 3fb59b78caacc3c27377e43e2607749f0c5833f0
+    site: ap1.datadoghq.com
+    criSocketPath: /run/dockershim.sock
+  override:
+    clusterAgent:
+      image:
+        name: gcr.io/datadoghq/cluster-agent:latest
+    

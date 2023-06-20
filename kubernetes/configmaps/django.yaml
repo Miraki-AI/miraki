@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: prod
-  name: envs-prod-django
+  namespace: {EKS_NAMESPACE}
+  name: envs-{EKS_NAMESPACE}-django
 data:
   DJANGO_SETTINGS_MODULE: "config.settings.production"
   DJANGO_SECURE_SSL_REDIRECT: "no"
@@ -22,7 +22,7 @@ data:
   DJANGO_SERVER_EMAIL: ""
   GODADDY_API_KEY: e5NFDRKrCwjN_RxQYrgc8wBxyUStV6yh77M
   GODADDY_API_SECRET: BSfRu1fx6ATJ8AJycJvCc9
-  ELB_URL: k8s-prod-ingress-2607fb3d8d-588934041.ap-south-1.elb.amazonaws.com
+  ELB_URL: k8s-{EKS_NAMESPACE}-ingress-2607fb3d8d-588934041.ap-south-1.elb.amazonaws.com
   GODADDY_DOMAIN: miraki.ai
   AWS_SES_REGION_ENDPOINT: email-smtp.ap-south-1.amazonaws.com
   AWS_SES_ACCESS_KEY_ID: AKIATO76J2JT2X2HT25X

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     service: django
-  namespace: prod
+  namespace: {EKS_NAMESPACE}
   name: django
 spec:
   replicas: 1
@@ -18,20 +18,20 @@ spec:
       containers:
       - args:
         - /start
-        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_api:{CIRCLE_BUILD_NUM}
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_api:{IMAGE_TAG}
         name: django
         ports:
           - name: gunicorn
             containerPort: 5000
         envFrom:
           - configMapRef:
-              name: envs-prod-django
+              name: envs-{EKS_NAMESPACE}-django
           - configMapRef:
-              name: envs-prod-postgres
+              name: envs-{EKS_NAMESPACE}-postgres
           - secretRef:
-              name: secrets-prod-django
+              name: secrets-{EKS_NAMESPACE}-django
           - secretRef:
-              name: secrets-prod-postgres
+              name: secrets-{EKS_NAMESPACE}-postgres
         env:
           - name: CELERY_BROKER_URL
             value: $(REDIS_URL)
@@ -44,7 +44,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: prod
+  namespace: {EKS_NAMESPACE}
   name: django
   labels:
     service: django

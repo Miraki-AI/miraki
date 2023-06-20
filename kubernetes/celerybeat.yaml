@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     service: celerybeat
-  namespace: prod
+  namespace: {EKS_NAMESPACE}
   name: celerybeat
 spec:
   replicas: 1
@@ -20,13 +20,13 @@ spec:
         - /start-celerybeat
         envFrom:
         - configMapRef:
-            name: envs-prod-django
+            name: envs-{EKS_NAMESPACE}-django
         - configMapRef:
-            name: envs-prod-postgres
+            name: envs-{EKS_NAMESPACE}-postgres
         - secretRef:
-            name: secrets-prod-django
+            name: secrets-{EKS_NAMESPACE}-django
         - secretRef:
-            name: secrets-prod-postgres
-        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celerybeat:{CIRCLE_BUILD_NUM}
+            name: secrets-{EKS_NAMESPACE}-postgres
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celerybeat:{IMAGE_TAG}
         name: celerybeat
       restartPolicy: Always

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     service: celeryworker
-  namespace: prod
+  namespace: {EKS_NAMESPACE}
   name: celeryworker
 spec:
   replicas: 1
@@ -17,18 +17,18 @@ spec:
     spec:
       containers:
       - name: celeryworker
-        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celeryworker:{CIRCLE_BUILD_NUM}
+        image: 238367134311.dkr.ecr.ap-south-1.amazonaws.com/miraki/miraki_celeryworker:{IMAGE_TAG}
         args:
           - /start-celeryworker
         envFrom:
           - configMapRef:
-              name: envs-prod-django
+              name: envs-{EKS_NAMESPACE}-django
           - configMapRef:
-              name: envs-prod-postgres
+              name: envs-{EKS_NAMESPACE}-postgres
           - secretRef:
-              name: secrets-prod-django
+              name: secrets-{EKS_NAMESPACE}-django
           - secretRef:
-              name: secrets-prod-postgres
+              name: secrets-{EKS_NAMESPACE}-postgres
         env:
           - name: CELERY_BROKER_URL
             value: $(REDIS_URL)
