@@ -67,6 +67,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run: pip install awscli
       - run:
           name: "Build and push image"
           command: |
