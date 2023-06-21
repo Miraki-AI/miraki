@@ -11,7 +11,7 @@ parameters:
     default: "miraki"
   IMAGE_TAG:
     type: string
-    default: "0.1.0"
+    default: "0.1.1"
 
 jobs:
   build_push_deploy_prod:
