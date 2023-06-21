@@ -77,8 +77,8 @@ jobs:
           command: |
             aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 238367134311.dkr.ecr.ap-south-1.amazonaws.com
             echo "Building image" 
-            cat production.yml | sed "s/{IMAGE_TAG}/prod/g" | docker-compose -f - build
-            cat production.yml | sed "s/{IMAGE_TAG}/prod/g" | docker-compose -f - push
+            cat production.yml | sed "s/{IMAGE_TAG}/${VERSION}/g" | docker-compose -f - build
+            cat production.yml | sed "s/{IMAGE_TAG}/${VERSION}/g" | docker-compose -f - push
       - slack/notify:
           channel: C05BV0S9JBC
           event: fail
