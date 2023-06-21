@@ -7,10 +7,10 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
     kubernetes.io/ingress.class: alb
   name: ingress
-  namespace: {EKS_NAMESPACE}
+  namespace: org
 spec:
   rules:
-  - host: "*.miraki.ai"
+  - host: "org.miraki.ai"
     http:
       paths:
       - path: /core

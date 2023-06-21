@@ -31,6 +31,8 @@ data:
   EMAIL_PORT: "587"
   EMAIL_REGION: ap-south-1
 
+  SUBDOMAIN: {EKS_NAMESPACE}
+
   # # Email
   # # ------------------------------------------------------------------------------
   # DJANGO_SERVER_EMAIL: 
