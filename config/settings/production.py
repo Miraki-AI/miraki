@@ -198,7 +198,7 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
-    {"url": f'http://{SUBDOMAIN}.miraki.ai', "description": "Production server"},
+    {"url": f'http://org.miraki.ai', "description": "Org Demo server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
