@@ -1,7 +1,19 @@
 from django import forms
 from miraki.apps.hub_tenant.models import *
 
-
+class InviteUserForm(forms.Form):
+    email = forms.EmailField()
+    
+class UserProfileUpdateForm(forms.Form):
+    id = forms.UUIDField()
+    name = forms.CharField(max_length=100)
+    mobile = forms.CharField(max_length=100)
+    profile_image = forms.ImageField(required=False)
+    password = forms.CharField(max_length=100, required=False)
+    
+    
+    
+    
 class UserOnboardForm(forms.Form):
     name = forms.CharField(max_length=100)
     email = forms.EmailField()
