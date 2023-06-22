@@ -30,3 +30,5 @@ EMAIL_PORT=587
 
 # Postgres
 DATABASE_URL=postgres://wrrVUrMZwLurzgXYAZJJQRFzwqrEKrps:KStxVuwLKu6wMsFUw5VE71FSGPsyUjHsuG0yfLMKT1Mj6w1k16Ntr1epVOrbb4OD@postgres:5432/miraki_db
+
+SUBDOMAIN=org

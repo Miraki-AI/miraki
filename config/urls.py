@@ -7,7 +7,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
-from miraki.apps.hub_tenant.views import CustomAuthToken, UserOnboardApi
+from miraki.apps.hub_tenant.views import *
 from miraki.apps.customers.views import TenantApiView
 
 urlpatterns = [
@@ -43,7 +43,11 @@ urlpatterns += [
 # APP API URLS
 urlpatterns += [
     path("core/api/new-tenant/", TenantApiView.as_view(), name="new-tenant" ),
-    path("core/api/user-onboard/", UserOnboardApi.as_view(), name="user-onboard" ),
+    # path("core/api/user-onboard/", UserOnboardApi.as_view(), name="user-onboard" ),
+    path("core/api/invite-user/", InviteUserApi.as_view(), name="invite-user" ),
+    path("core/api/is-user-exists/", IsUserExists.as_view(), name="is-user-exists" ),
+    
+    
     
 ]
 

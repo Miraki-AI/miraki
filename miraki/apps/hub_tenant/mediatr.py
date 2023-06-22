@@ -1,18 +1,19 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from miraki.apps.hub_tenant.models import *
 from miraki.apps.hub_tenant.base.models import UserProfile
 from miraki.apps.hub_tenant.serializer import *
 from miraki.apps.hub_tenant.permissions import Permissions
+from miraki.apps.hub_tenant.forms import *
 User = get_user_model()
-class UserOnBoard:
-    def __init__(self, request):
-        self.data = request.data
-        self.tenant = request.tenant
-        self.profile_image = request.FILES.get('profile_image')
-        logging.info(f"User onboarding request: {self.data}")
+class ManageUser:
+    def __init__(self, request=None):
+        if request:
+            self.data = request.data
+            self.profile_image = request.FILES.get('profile_image' , None)
         
     def onboard_user(self):
         try:
@@ -28,7 +29,6 @@ class UserOnBoard:
         try:
             user = User()
             user.email = self.data['email']
-            user.set_password(self.data['password'])
             user.save()
             return user
         except Exception as e:
@@ -37,27 +37,89 @@ class UserOnBoard:
     def create_userprofile(self, user):
         try:
             userprofile = UserProfile()
-            userprofile.name = self.data['name']
-            userprofile.email = self.data['email']
-            userprofile.mobile = self.data['mobile']
+            userprofile.name = self.data.get('name', None)
+            userprofile.email = self.data.get('email', None)
+            userprofile.mobile = self.data.get('mobile', None)
             userprofile.profile_img = self.profile_image
             userprofile.user = user
             userprofile.is_active = True
             if self.data['org_admin'] == 'true':
                 userprofile.is_admin = True
             userprofile.save()
+            return userprofile
         except Exception as e:
             raise Exception(f'Error in Creating User Profile{str(e)}')
     
-    def is_user_exists(self):
+    def update_userprofile(self):
         try:
-            User.objects.get(email=self.data['email'])
+            if not UserProfileUpdateForm(self.data).is_valid():
+                raise Exception(UserProfileUpdateForm(self.data).errors)
+            userprofile = UserProfile.objects.get(id=self.data['id'])
+            userprofile.name = self.data.get('name', None)
+            userprofile.mobile = self.data.get('mobile', None)
+            userprofile.profile_img = self.profile_image
+            userprofile.is_active = True
+            userprofile.save()
+            if self.data.get('password', None):
+                userprofile.user.set_password(self.data['password'])
+                userprofile.user.save()
+            return UserProfileSerializer(userprofile).data
+        except Exception as e:
+            raise Exception(f'Error in Updating User Profile{str(e)}')
+        
+    
+    def invite_userprofile(self, user):
+        try:
+            userprofile = UserProfile()
+            if self.data.get('email', None):
+                userprofile.email = self.data.get('email', None)
+                userprofile.user = user
+                userprofile.save()
+            return userprofile
+        except Exception as e:
+            raise Exception(f'Error in Creating User Profile{str(e)}')
+    
+    def is_user_exists(self, email=None):
+        try:
+            if email:
+                user = User.objects.get(email=email)
+            else:
+                user = User.objects.get(email=self.data['email'])
             return True
         except Exception as e:
             return False
     
     def send_email(self):
         pass
+    
+    def invite_user(self):
+        try:
+            if self.is_user_exists():
+                raise Exception('User already exists')
+            if user := self.create_user():
+                userprofile = self.invite_userprofile(user)
+                self.send_invite_email(userprofile)
+                return True
+        except Exception as e:
+            raise Exception(
+                f'Error in inviting user - {str(e)}'
+            )
+    
+    def send_invite_email(self, userprofile):
+        try:
+            invite_link = f"http://{settings.SUBDOMAIN}/miraki.ai/invite/{userprofile.id}?email={userprofile.email}"
+            logging.info(f"Invite link: {invite_link}")
+        except Exception as e:
+            logging.error(f"Error in sending invite email - {str(e)}")
+            raise Exception(f'Error in sending invite email - {str(e)}')
+    
+    def get_user_profile(self, user_id=None):
+        try:
+            userprofile = UserProfile.objects.get(id=user_id)
+            userprofile = UserProfileSerializer(userprofile).data
+            return userprofile
+        except Exception as e:
+            raise Exception(f'Error in getting user - {str(e)}')
     
 
 class ManageSite:
@@ -85,11 +147,10 @@ class ManageSite:
             if self.data.get('site_id', None):
                 site = self.get_site_instance_by_id(self.data['site_id'])
                 serializer = SiteSerializer(site)
-                return serializer.data
             else:
                 sites = Site.objects.filter(created_by=self.userprofile)
                 serializer = SiteSerializer(sites, many=True)
-                return serializer.data
+            return serializer.data
         except Exception as e:
             raise Exception(f'Error in getting site - {str(e)}')
     

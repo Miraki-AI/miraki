@@ -5,7 +5,7 @@ from django.shortcuts import render
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework.authtoken.views import APIView
+from rest_framework.views import APIView
 from rest_framework import viewsets
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializer import UserProfileSerializer
@@ -36,6 +36,55 @@ class CustomAuthToken(ObtainAuthToken):
             'userprofile':userprofile
         })
         
+class InviteUserApi(APIView):
+    
+    @extend_schema(
+        methods=['POST'],
+        parameters=[
+            OpenApiParameter(
+                name='email',
+                type=str,
+                location=OpenApiParameter.PATH,
+                description='Your parameter description',
+            ),
+        ]
+        )
+    def post(self, request, *args, **kwargs):
+        logging.info(f"Invite user request: {request.data}")
+        try:
+            invite_user_form = InviteUserForm(request.data)
+            if not invite_user_form.is_valid():
+                ManageUser(request).invite_user()
+                return Response({'message': 'Error inviting user', 'error': invite_user_form.errors}, status=400)
+            return Response({'message': 'User invited successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error inviting user', 'error': str(e)}, status=400)
+
+
+class IsUserExists(APIView):
+    
+    @extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name='id',
+            type=str,
+            location=OpenApiParameter.QUERY,
+            description='Your parameter description',
+            enum=[],
+        )
+    ]
+    )
+    def get(self, request, *args, **kwargs):
+        logging.info(f"Is user exists ? : {request.query_params}")
+        try:
+            if user_id := request.query_params.get('id', None):
+                userprofile = ManageUser().get_user_profile(user_id)
+                logging.info(f"User profile: {userprofile}")
+                return Response(userprofile, status=200)
+            else:
+                return Response({'message': 'User ID is required'}, status=400)
+        except Exception as e:
+            return Response({'message': 'User Does Not Exist', 'error': str(e)}, status=400)
 
 class UserOnboardApi(APIView):
     def post(self, request, *args, **kwargs):
@@ -59,12 +108,20 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     
     def list(self, request, *args, **kwargs):
         try:
-            logging.info(f"User profile request: {request.tenant}")
+            logging.info("User profile request:")
             userprofile = UserProfile.objects.all()
             serializer = UserProfileSerializer(userprofile, many=True)
             return Response(serializer.data, status=200)
         except Exception as e:
             return Response({'message': 'Error fetching user profile', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            logging.info(f"Update user profile request: {request.data}")
+            userprofile = ManageUser(request).update_userprofile()
+            return Response(userprofile, status=200)
+        except Exception as e:
+            return Response({'message': 'Error updating user profile', 'error': str(e)}, status=400)
     
 
 class SiteViewSet(viewsets.ModelViewSet):
@@ -249,3 +306,5 @@ class TagTopicsViewSet(viewsets.ModelViewSet):
         tag_topics = TagTopics.objects.create(name=data['name'], machine_id=data['machine_id'])
         serializer = TagTopicsSerializer(tag_topics)
         return Response(serializer.data, status=200)
+    
+    
