@@ -7,7 +7,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets
+from rest_framework.decorators import permission_classes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+
+
+
 from .serializer import UserProfileSerializer
 from .models import UserProfile
 from django.core.files.base import ContentFile
@@ -60,7 +64,7 @@ class InviteUserApi(APIView):
         except Exception as e:
             return Response({'message': 'Error inviting user', 'error': str(e)}, status=400)
 
-
+@permission_classes([])
 class IsUserExists(APIView):
     
     @extend_schema(
@@ -85,14 +89,16 @@ class IsUserExists(APIView):
                 return Response({'message': 'User ID is required'}, status=400)
         except Exception as e:
             return Response({'message': 'User Does Not Exist', 'error': str(e)}, status=400)
-
+        
+        
+@permission_classes([])
 class UserOnboardApi(APIView):
     def post(self, request, *args, **kwargs):
         try:
             user_onboard_form = UserOnboardForm(request.data)
             if not user_onboard_form.is_valid():
                 return Response({'message': 'Error activating user account', 'error': user_onboard_form.errors}, status=400)
-            UserOnBoard(request).onboard_user()
+            ManageUser(request).onboard_user()
             return Response({'message': 'User account activated successfully!'}, status=200)
         except Exception as e:
             return Response({'message': 'Error activating user account', 'error': str(e)}, status=400)

@@ -17,11 +17,19 @@ class ManageUser:
         
     def onboard_user(self):
         try:
-            if self.is_user_exists():
-                raise Exception('User already exists')
-            if user := self.create_user():
-                self.create_userprofile(user)
-                return True
+            userprofile = UserProfile.objects.get(id=self.data['id'])
+            if userprofile.onboarded:
+                raise Exception('User Already Onboarded')
+            userprofile.name = self.data.get('name', None)
+            userprofile.mobile = self.data.get('mobile', None)
+            if self.profile_image:
+                userprofile.profile_img = self.profile_image
+            user_instance = userprofile.user
+            user_instance.set_password(self.data['password'])
+            user_instance.save()
+            userprofile.onboarded = True
+            userprofile.save()
+        
         except Exception as e:
             raise Exception(str(e))
     
