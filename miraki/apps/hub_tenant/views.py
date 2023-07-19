@@ -57,8 +57,9 @@ class InviteUserApi(APIView):
         logging.info(f"Invite user request: {request.data}")
         try:
             invite_user_form = InviteUserForm(request.data)
-            if not invite_user_form.is_valid():
+            if invite_user_form.is_valid():
                 ManageUser(request).invite_user()
+            else:
                 return Response({'message': 'Error inviting user', 'error': invite_user_form.errors}, status=400)
             return Response({'message': 'User invited successfully!'}, status=200)
         except Exception as e:
