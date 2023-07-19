@@ -4,6 +4,17 @@ from miraki.apps.hub_tenant.base.models import UUIDTimeStampedModel, UserRolesUU
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+
+class Organization(UUIDTimeStampedModel):
+    space_name = models.CharField(max_length=100)
+    org_name = models.CharField(max_length=500)
+    owners = models.ManyToManyField(UserProfile, related_name='%(class)s_owners', blank=True)
+    address = models.JSONField(default=dict)
+    org_img = models.ImageField(upload_to='org_img', blank=True, null=True)
+    
+    def __str__(self):
+        return self.space_name
+    
 class ConnectionInfo(UUIDTimeStampedModel):
     ip_address = models.CharField(max_length=100, blank=True, null=True)
     port = models.IntegerField(default=0)
