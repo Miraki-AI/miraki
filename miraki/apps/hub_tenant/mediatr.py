@@ -497,3 +497,37 @@ class ManageMachine:
         except Exception as e:
             raise Exception(f'Error in updating machines - {str(e)}')
         
+        
+class ManageOrganization:
+    def __init__(self, request):
+        self.request = request
+        self.data = request.data
+        
+        logging.info(f"Manage Organization request: {self.data}")
+        
+    def __get_user(self):
+        try:
+            return UserProfile.objects.get(user=self.request.user)
+        except Exception as e:
+            raise Exception(f'Error in getting user - {str(e)}')
+        
+    def get_organization_instance_by_id(self, organization_id):
+        try:
+            return Organization.objects.get(id=organization_id)
+        except Exception as e:
+            raise Exception(f'Error in getting organization by id - {str(e)}')
+        
+   
+    def update_organization(self):
+        try:
+            if id:
+                organization = self.get_organization_instance_by_id(id)
+                organization.org_name = self.data['org_name']
+                organization.org_img = self.data['org_img']
+                organization.address = self.data['address']
+                organization.owners = self.data['owners']
+                organization.save()
+            else:
+                pass
+        except Exception as e:
+            raise Exception(f'Error in updating organization - {str(e)}')

@@ -131,6 +131,23 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Error updating user profile', 'error': str(e)}, status=400)
     
 
+class OrganizationViewSet(viewsets.ModelViewSet):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    
+    def list(self, request, *args, **kwargs):
+        organizations = Organization.objects.all()
+        serializer = OrganizationSerializer(organizations, many=True)
+        return Response(serializer.data, status=200)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            logging.info(f"Update organization request: {request.data}")
+            organization = ManageOrganization(request).update_organization()
+            return Response(organization, status=200)
+        except Exception as e:
+            return Response({'message': 'Error updating organization', 'error': str(e)}, status=400)
+    
 class SiteViewSet(viewsets.ModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer

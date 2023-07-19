@@ -1,14 +1,10 @@
 from django.contrib import admin
 from .models import *
-from miraki.apps.customers.models import Organization
 from miraki.apps.hub_tenant.base.models import UserProfile
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ['id']
 
-@admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ['id']
 
 
 @admin.register(Site)
@@ -67,3 +63,7 @@ class AGVAdmin(admin.ModelAdmin):
 @admin.register(TagTopics)
 class TagTopicsAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
+    
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'space_name', 'org_name', 'address', 'org_img']
