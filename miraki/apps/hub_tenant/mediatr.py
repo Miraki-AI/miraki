@@ -165,33 +165,33 @@ class ManageSite:
     def create_site(self):
         permissions = self.permissions.get_site_permissions()
         logging.info(f"Permissions: {permissions}")        
-        # try:
-        #     site = Site(
-        #         name=self.data['name'],
-        #         address=self.request.data['address'],
-        #         state=self.request.data['state'],
-        #         zipcode=self.request.data['zipcode'],
-        #         country=self.request.data['country'],
-        #         created_by=self.__get_user()
+        try:
+            site = Site(
+                name=self.data['name'],
+                address=self.request.data['address'],
+                state=self.request.data['state'],
+                zipcode=self.request.data['zipcode'],
+                country=self.request.data['country'],
+                created_by=self.__get_user()
                 
-        #     )
-        #     site.save()
+            )
+            site.save()
             
-        #     if self.data.get('areas', None):
-        #         for area in self.data['areas']:
-        #             site.areas.add(area)
+            if self.data.get('areas', None):
+                for area in self.data['areas']:
+                    site.areas.add(area)
             
-        #     if self.data.get('allowed_users', None):
-        #         for user in self.data['allowed_users']:
-        #             site.allowed_users.add(user)
-        #     if self.data.get('admin_users', None):
-        #         for user in self.data['admin_users']:
-        #             site.admin_users.add(user)
+            if self.data.get('allowed_users', None):
+                for user in self.data['allowed_users']:
+                    site.allowed_users.add(user)
+            if self.data.get('admin_users', None):
+                for user in self.data['admin_users']:
+                    site.admin_users.add(user)
                     
-        #     serializer = SiteSerializer(site)
-        #     return serializer.data
-        # except Exception as e:
-        #     raise Exception(f'Error in creating site - {str(e)}')
+            serializer = SiteSerializer(site)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in creating site - {str(e)}')
     
     def delete_site(self, instance):
         try:
