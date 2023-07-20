@@ -162,8 +162,12 @@ class ManageSite:
             raise Exception(f'Error in getting site - {str(e)}')
     
     def create_site(self):
-        permissions = self.permissions.get_site_permissions()
-        logging.info(f"Permissions: {permissions}")        
+        try:
+            permissions = self.permissions.get_site_permissions()
+            logging.info(f"Permissions: {permissions}")
+        except :
+            pass
+             
         try:
             site = Site(
                 name=self.data['name'],
