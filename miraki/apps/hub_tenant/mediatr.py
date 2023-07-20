@@ -133,7 +133,6 @@ class ManageUser:
 class ManageSite:
     def __init__(self, request=None):
         self.data = request.data
-        self.tenant = request.tenant
         self.request = request
         self.userprofile = self.__get_user()
         self.permissions = Permissions(self.userprofile)
@@ -222,7 +221,6 @@ class ManageSite:
 class ManageArea:
     def __init__(self, request=None):
         self.data = request.data
-        self.tenant = request.tenant
         self.request = request
         logging.info(f"Manage Area request: {self.data}")
     
@@ -292,7 +290,6 @@ class ManageArea:
 class ManageLine:
     def __init__(self, request):
         self.data = request.data
-        self.tenant = request.tenant
         self.request = request
         logging.info(f"Manage Line request: {self.data}")
     
@@ -361,7 +358,6 @@ class ManageProcess:
     def __init__(self, request):
         self.request = request
         self.data = request.data
-        self.tenant = request.tenant
         
         logging.info(f"Manage Process request: {self.data}")
     
@@ -430,7 +426,6 @@ class ManageMachine:
     def __init__(self, request):
         self.request = request
         self.data = request.data
-        self.tenant = request.tenant
         
         logging.info(f"Manage Machine request: {self.data}")
         
