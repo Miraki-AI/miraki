@@ -8,6 +8,7 @@ from miraki.apps.hub_tenant.base.models import UserProfile
 from miraki.apps.hub_tenant.serializer import *
 from miraki.apps.hub_tenant.permissions import Permissions
 from miraki.apps.hub_tenant.forms import *
+from django.core.mail import send_mail
 User = get_user_model()
 class ManageUser:
     def __init__(self, request=None):
@@ -17,11 +18,19 @@ class ManageUser:
         
     def onboard_user(self):
         try:
-            if self.is_user_exists():
-                raise Exception('User already exists')
-            if user := self.create_user():
-                self.create_userprofile(user)
-                return True
+            userprofile = UserProfile.objects.get(id=self.data['id'])
+            if userprofile.onboarded:
+                raise Exception('User Already Onboarded')
+            userprofile.name = self.data.get('name', None)
+            userprofile.mobile = self.data.get('mobile', None)
+            if self.profile_image:
+                userprofile.profile_img = self.profile_image
+            user_instance = userprofile.user
+            user_instance.set_password(self.data['password'])
+            user_instance.save()
+            userprofile.onboarded = True
+            userprofile.save()
+        
         except Exception as e:
             raise Exception(str(e))
     
@@ -89,8 +98,19 @@ class ManageUser:
         except Exception as e:
             return False
     
-    def send_email(self):
-        pass
+    def send_email(self, email):
+        try:
+            send_mail(
+            email['subject'],  # subject
+            email['message'],  # message
+            "vijenderpanda@miraki.ai" , # from email
+            email['to_emails'],  # to email
+            fail_silently=False,
+        )
+        except Exception as e:
+            logging.error(f"Error in sending email - {str(e)}")
+            pass
+        
     
     def invite_user(self):
         try:
@@ -98,8 +118,7 @@ class ManageUser:
                 raise Exception('User already exists')
             if user := self.create_user():
                 userprofile = self.invite_userprofile(user)
-                self.send_invite_email(userprofile)
-                return True
+                return self.send_invite_email(userprofile)
         except Exception as e:
             raise Exception(
                 f'Error in inviting user - {str(e)}'
@@ -109,6 +128,19 @@ class ManageUser:
         try:
             invite_link = f"http://{settings.SUBDOMAIN}/miraki.ai/invite/{userprofile.id}?email={userprofile.email}"
             logging.info(f"Invite link: {invite_link}")
+            email = dict(
+                subject='Invitation to Miraki',
+                message = f"Hi {userprofile.name},\n\nYou have been invited to Miraki. Please click on the link below to complete your registration.\n\n{invite_link}\n\nThanks,\nMiraki Team",
+                to_emails = [
+                    'vijenderpanda@miraki.ai',
+                    'sarthakkapoor@miraki.ai',
+                    'ajaisrivastava@miraki.ai',
+                    'bharteshsingh@miraki.ai',
+                    'vijender.in@gmail.com'
+                ]
+            )
+            self.send_email(email)
+            return invite_link
         except Exception as e:
             logging.error(f"Error in sending invite email - {str(e)}")
             raise Exception(f'Error in sending invite email - {str(e)}')
@@ -125,7 +157,6 @@ class ManageUser:
 class ManageSite:
     def __init__(self, request=None):
         self.data = request.data
-        self.tenant = request.tenant
         self.request = request
         self.userprofile = self.__get_user()
         self.permissions = Permissions(self.userprofile)
@@ -155,35 +186,39 @@ class ManageSite:
             raise Exception(f'Error in getting site - {str(e)}')
     
     def create_site(self):
-        permissions = self.permissions.get_site_permissions()
-        logging.info(f"Permissions: {permissions}")        
-        # try:
-        #     site = Site(
-        #         name=self.data['name'],
-        #         address=self.request.data['address'],
-        #         state=self.request.data['state'],
-        #         zipcode=self.request.data['zipcode'],
-        #         country=self.request.data['country'],
-        #         created_by=self.__get_user()
+        try:
+            permissions = self.permissions.get_site_permissions()
+            logging.info(f"Permissions: {permissions}")
+        except :
+            pass
+             
+        try:
+            site = Site(
+                name=self.data['name'],
+                address=self.request.data['address'],
+                state=self.request.data['state'],
+                zipcode=self.request.data['zipcode'],
+                country=self.request.data['country'],
+                created_by=self.__get_user()
                 
-        #     )
-        #     site.save()
+            )
+            site.save()
             
-        #     if self.data.get('areas', None):
-        #         for area in self.data['areas']:
-        #             site.areas.add(area)
+            if self.data.get('areas', None):
+                for area in self.data['areas']:
+                    site.areas.add(area)
             
-        #     if self.data.get('allowed_users', None):
-        #         for user in self.data['allowed_users']:
-        #             site.allowed_users.add(user)
-        #     if self.data.get('admin_users', None):
-        #         for user in self.data['admin_users']:
-        #             site.admin_users.add(user)
+            if self.data.get('allowed_users', None):
+                for user in self.data['allowed_users']:
+                    site.allowed_users.add(user)
+            if self.data.get('admin_users', None):
+                for user in self.data['admin_users']:
+                    site.admin_users.add(user)
                     
-        #     serializer = SiteSerializer(site)
-        #     return serializer.data
-        # except Exception as e:
-        #     raise Exception(f'Error in creating site - {str(e)}')
+            serializer = SiteSerializer(site)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in creating site - {str(e)}')
     
     def delete_site(self, instance):
         try:
@@ -214,7 +249,6 @@ class ManageSite:
 class ManageArea:
     def __init__(self, request=None):
         self.data = request.data
-        self.tenant = request.tenant
         self.request = request
         logging.info(f"Manage Area request: {self.data}")
     
@@ -284,7 +318,6 @@ class ManageArea:
 class ManageLine:
     def __init__(self, request):
         self.data = request.data
-        self.tenant = request.tenant
         self.request = request
         logging.info(f"Manage Line request: {self.data}")
     
@@ -353,7 +386,6 @@ class ManageProcess:
     def __init__(self, request):
         self.request = request
         self.data = request.data
-        self.tenant = request.tenant
         
         logging.info(f"Manage Process request: {self.data}")
     
@@ -422,7 +454,6 @@ class ManageMachine:
     def __init__(self, request):
         self.request = request
         self.data = request.data
-        self.tenant = request.tenant
         
         logging.info(f"Manage Machine request: {self.data}")
         
@@ -489,3 +520,37 @@ class ManageMachine:
         except Exception as e:
             raise Exception(f'Error in updating machines - {str(e)}')
         
+        
+class ManageOrganization:
+    def __init__(self, request):
+        self.request = request
+        self.data = request.data
+        
+        logging.info(f"Manage Organization request: {self.data}")
+        
+    def __get_user(self):
+        try:
+            return UserProfile.objects.get(user=self.request.user)
+        except Exception as e:
+            raise Exception(f'Error in getting user - {str(e)}')
+        
+    def get_organization_instance_by_id(self, organization_id):
+        try:
+            return Organization.objects.get(id=organization_id)
+        except Exception as e:
+            raise Exception(f'Error in getting organization by id - {str(e)}')
+        
+   
+    def update_organization(self):
+        try:
+            if id:
+                organization = self.get_organization_instance_by_id(id)
+                organization.org_name = self.data['org_name']
+                organization.org_img = self.data['org_img']
+                organization.address = self.data['address']
+                organization.owners = self.data['owners']
+                organization.save()
+            else:
+                pass
+        except Exception as e:
+            raise Exception(f'Error in updating organization - {str(e)}')

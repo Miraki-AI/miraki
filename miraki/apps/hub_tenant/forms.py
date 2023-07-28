@@ -15,6 +15,7 @@ class UserProfileUpdateForm(forms.Form):
     
     
 class UserOnboardForm(forms.Form):
+    id = forms.UUIDField()
     name = forms.CharField(max_length=100)
     email = forms.EmailField()
     mobile = forms.CharField(max_length=100)
