@@ -8,6 +8,7 @@ from miraki.apps.hub_tenant.base.models import UserProfile
 from miraki.apps.hub_tenant.serializer import *
 from miraki.apps.hub_tenant.permissions import Permissions
 from miraki.apps.hub_tenant.forms import *
+from django.core.mail import send_mail
 User = get_user_model()
 class ManageUser:
     def __init__(self, request=None):
@@ -97,8 +98,19 @@ class ManageUser:
         except Exception as e:
             return False
     
-    def send_email(self):
-        pass
+    def send_email(self, email):
+        try:
+            send_mail(
+            email['subject'],  # subject
+            email['message'],  # message
+            "vijenderpanda@miraki.ai" , # from email
+            email['to_emails'],  # to email
+            fail_silently=False,
+        )
+        except Exception as e:
+            logging.error(f"Error in sending email - {str(e)}")
+            pass
+        
     
     def invite_user(self):
         try:
@@ -106,8 +118,7 @@ class ManageUser:
                 raise Exception('User already exists')
             if user := self.create_user():
                 userprofile = self.invite_userprofile(user)
-                self.send_invite_email(userprofile)
-                return True
+                return self.send_invite_email(userprofile)
         except Exception as e:
             raise Exception(
                 f'Error in inviting user - {str(e)}'
@@ -117,6 +128,19 @@ class ManageUser:
         try:
             invite_link = f"http://{settings.SUBDOMAIN}/miraki.ai/invite/{userprofile.id}?email={userprofile.email}"
             logging.info(f"Invite link: {invite_link}")
+            email = dict(
+                subject='Invitation to Miraki',
+                message = f"Hi {userprofile.name},\n\nYou have been invited to Miraki. Please click on the link below to complete your registration.\n\n{invite_link}\n\nThanks,\nMiraki Team",
+                to_emails = [
+                    'vijenderpanda@miraki.ai',
+                    'sarthakkapoor@miraki.ai',
+                    'ajaisrivastava@miraki.ai',
+                    'bharteshsingh@miraki.ai',
+                    'vijender.in@gmail.com'
+                ]
+            )
+            self.send_email(email)
+            return invite_link
         except Exception as e:
             logging.error(f"Error in sending invite email - {str(e)}")
             raise Exception(f'Error in sending invite email - {str(e)}')
