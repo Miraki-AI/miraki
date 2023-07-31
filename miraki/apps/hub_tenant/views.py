@@ -332,3 +332,38 @@ class TagTopicsViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=200)
     
     
+class MyDashboardViewSet(viewsets.ModelViewSet):
+    queryset = MyDashboard.objects.all()
+    serializer_class = MyDashboardSerializer
+    
+    def list(self, request, *args, **kwargs):
+        try:
+            mydashboard = ManageMyDashboard(request).get_my_dashboards()
+            return Response(mydashboard, status=200)
+        except MyDashboard.DoesNotExist:
+            return Response({'message': 'No Dashboard not found'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error fetching dashboard', 'error': str(e)}, status=400)
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            mydashboard = ManageMyDashboard(request).create_my_dashboard()
+            return Response(mydashboard, status=200)
+        except Exception as e:
+            return Response({'message': 'Error creating dashboard', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            mydashboard = ManageMyDashboard(request).update_my_dashboard()
+            return Response(mydashboard, status=200)
+        except Exception as e:
+            return Response({'message': 'Error updating dashboard', 'error': str(e)}, status=400)
+        
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageMyDashboard(request).delete_my_dashboard(instance)
+            return Response({'message': 'Dashboard deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting dashboard', 'error': str(e)}, status=400)
+            

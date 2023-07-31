@@ -67,3 +67,8 @@ class TagTopicsAdmin(admin.ModelAdmin):
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ['id', 'space_name', 'org_name', 'address', 'org_img']
+    
+
+@admin.register(MyDashboard)
+class MyDashboardAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'created_by', 'widgets', 'is_default']
