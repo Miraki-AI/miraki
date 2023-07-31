@@ -187,3 +187,12 @@ class Site(UserRolesUUIDTimeStampedModel):
     def __str__(self):
         return self.name
 
+
+class MyDashboard(UUIDTimeStampedModel):
+    name = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=False)
+    created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    widgets = models.JSONField(default=dict)
+    
+    def __str__(self):
+        return self.name

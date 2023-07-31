@@ -124,3 +124,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = '__all__'
         
+
+
+class MyDashboardSerializer(serializers.ModelSerializer):
+    created_by = UserProfileSerializer()
+    class Meta:
+        model = MyDashboard
+        fields = ('id', 'name', 'created_by', 'widgets', 'is_default')

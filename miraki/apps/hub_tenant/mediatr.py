@@ -554,3 +554,69 @@ class ManageOrganization:
                 pass
         except Exception as e:
             raise Exception(f'Error in updating organization - {str(e)}')
+        
+        
+class ManageMyDashboard():
+    
+    def __init__(self, request):
+        self.request = request
+        self.data = request.data
+        
+        logging.info(f"Manage My Dashboard request: {self.data}")
+    
+    def __get_user(self):
+        try:
+            return UserProfile.objects.get(user=self.request.user)
+        except Exception as e:
+            raise Exception(f'Error in getting user - {str(e)}')
+        
+    
+    def get_my_dashboards(self):
+        try:
+            dashboards = MyDashboard.objects.filter(created_by=self.__get_user())
+            serializer = MyDashboardSerializer(dashboards, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting my dashboards - {str(e)}')
+        
+    def get_my_default_dashboard(self):
+        try:
+            dashboard = MyDashboard.objects.get(created_by=self.__get_user(), is_default=True)
+            serializer = MyDashboardSerializer(dashboard)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting my default dashboard - {str(e)}')
+        
+    
+    def create_my_dashboard(self):
+        try:
+            dashboard = MyDashboard(
+                name=self.data['name'],
+                created_by=self.__get_user(),
+                is_default=False,
+                widgets=self.data['widgets']
+            )
+            dashboard.save()
+            serializer = MyDashboardSerializer(dashboard)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in creating my dashboard - {str(e)}')
+        
+    def update_my_dashboard(self):
+        try:
+            dashboard = MyDashboard.objects.get(id=self.data['id'])
+            dashboard.name = self.data['name']
+            dashboard.widgets = self.data['widgets']
+            dashboard.is_default = self.data['is_default']
+            dashboard.save()
+            serializer = MyDashboardSerializer(dashboard)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in updating my dashboard - {str(e)}')
+        
+    def delete_my_dashboard(self, instance):
+        try:
+            MyDashboard.objects.get(id=instance).delete()
+            return True
+        except Exception as e:
+            raise Exception(f'Error in deleting my dashboard - {str(e)}')
