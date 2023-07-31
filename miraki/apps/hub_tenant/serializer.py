@@ -1,16 +1,29 @@
 from rest_framework import serializers
 from .models import *
+
 from miraki.apps.customers.models import Organization
 from miraki.apps.hub_tenant.base.models import UserProfile
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+        
+        
 class OrganizationSerializer(serializers.ModelSerializer):
+    owners = UserProfileSerializer(many=True, read_only=True)
     class Meta:
         model = Organization
-        fields = '__all__'
+        fields = ('id', 'space_name', 'org_name', 'org_img', 'address', 'owners')
 
 class TagTopicsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagTopics
         fields = '__all__'
+        
+        
 class PLCSerializer(serializers.ModelSerializer):
     tags = TagTopicsSerializer(many=True, read_only=True)
     class Meta:
@@ -42,6 +55,8 @@ class AGVSerializer(serializers.ModelSerializer):
 
 class MachineTypeModelSerializer(serializers.ModelSerializer):
     machine_type_model = serializers.SerializerMethodField()
+    allowed_users = UserProfileSerializer(many=True, read_only=True)
+    admin_users = UserProfileSerializer(many=True, read_only=True)
 
     def get_machine_type_model(self, obj):
         machine_type_model = obj.machine_type_model.model_class()
@@ -63,7 +78,6 @@ class MachineTypeModelSerializer(serializers.ModelSerializer):
 
         if serializer_class:
             serializer = serializer_class(obj, many=True)
-            logging.info("machines", serializer.data)
             return serializer.data
 
         return None
@@ -77,6 +91,9 @@ class MachineTypeModelSerializer(serializers.ModelSerializer):
 
 class MachineSerializer(serializers.ModelSerializer):
     machine_type_model = serializers.SerializerMethodField()
+    allowed_users = UserProfileSerializer(many=True, read_only=True)
+    admin_users = UserProfileSerializer(many=True, read_only=True)
+    created_by = UserProfileSerializer()
     
     def get_machine_type_model(self, obj):
         return MachineTypeModelSerializer(obj).data
@@ -87,20 +104,30 @@ class MachineSerializer(serializers.ModelSerializer):
 class ProcessSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     machine = MachineSerializer()
+    allowed_users = UserProfileSerializer(many=True, read_only=True)
+    admin_users = UserProfileSerializer(many=True, read_only=True)
+    created_by = UserProfileSerializer()
     
     def get_tags(self, obj):
         return TagTopicsSerializer(TagTopics.objects.filter(process=obj.id), many=True).data
     class Meta:
         model = Process
         fields = '__all__'
+        
 class LineSerializer(serializers.ModelSerializer):
     processes = ProcessSerializer(many=True, read_only=True)
+    allowed_users = UserProfileSerializer(many=True, read_only=True)
+    admin_users = UserProfileSerializer(many=True, read_only=True)
+    created_by = UserProfileSerializer()
     class Meta:
         model = Line
         fields = '__all__'
         
 class AreaSerializer(serializers.ModelSerializer):
     lines = LineSerializer(many=True, read_only=True)
+    allowed_users = UserProfileSerializer(many=True, read_only=True)
+    admin_users = UserProfileSerializer(many=True, read_only=True)
+    created_by = UserProfileSerializer()
     class Meta:
         model = Area
         fields = '__all__'
@@ -108,22 +135,13 @@ class AreaSerializer(serializers.ModelSerializer):
 
 class SiteSerializer(serializers.ModelSerializer):
     areas = AreaSerializer(many=True, read_only=True)
+    allowed_users = UserProfileSerializer(many=True, read_only=True)
+    admin_users = UserProfileSerializer(many=True, read_only=True)
+    created_by = UserProfileSerializer()
     class Meta:
         model = Site
         fields = '__all__'
 
-
-
-
-
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = UserProfile
-        fields = '__all__'
-        
 
 
 class MyDashboardSerializer(serializers.ModelSerializer):
