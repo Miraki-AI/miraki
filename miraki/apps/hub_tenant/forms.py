@@ -1,5 +1,7 @@
 from django import forms
 from miraki.apps.hub_tenant.models import *
+from django.contrib.postgres.fields import ArrayField
+
 
 class InviteUserForm(forms.Form):
     email = forms.EmailField()
@@ -41,8 +43,8 @@ class MachineForm(forms.Form):
     description = forms.CharField(max_length=100)
     machine_type = forms.CharField(max_length=100)
     is_active = forms.BooleanField()
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
     process = forms.UUIDField()
 
 class PLCForm(forms.Form):
@@ -93,15 +95,15 @@ class ProcessForm(forms.Form):
     previous_process = forms.ModelChoiceField(queryset=Process.objects.all(), required=False)
     next_process = forms.ModelChoiceField(queryset=Process.objects.all(), required=False)
     process_type = forms.CharField(max_length=100)
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
     line = forms.UUIDField()    
 
 class LineForm(forms.Form):
     name = forms.CharField(max_length=100)
     processes = forms.ModelMultipleChoiceField(queryset=Process.objects.all(), required=False)
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
     area = forms.UUIDField()
 
 
@@ -109,9 +111,8 @@ class AreaForm(forms.Form):
     name = forms.CharField(max_length=100)
     site = forms.UUIDField()
     lines = forms.ModelMultipleChoiceField(queryset=Line.objects.all(), required=False)
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
 
 class SiteForm(forms.Form):
     name = forms.CharField(max_length=100)
@@ -120,5 +121,5 @@ class SiteForm(forms.Form):
     zipcode = forms.CharField(max_length=100)
     country = forms.CharField(max_length=100)
     areas = forms.ModelMultipleChoiceField(queryset=Area.objects.all(), required=False)
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())

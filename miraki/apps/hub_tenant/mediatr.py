@@ -188,6 +188,7 @@ class ManageSite(FetchPermissions):
             raise Exception(f'Error in getting site by id - {str(e)}')
     
     def get_site(self):
+        logging.info("geeting sites")
         try:
             if self.data.get('site_id', None):
                 site = self.get_site_instance_by_id(self.data['site_id'])
@@ -249,14 +250,17 @@ class ManageSite(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in creating site - {str(e)}')
         
-    def update_site(self):
+    def update_site(self, instance):
+        logging.info("Updating site")
         try:
-            site = self.get_site_instance_by_id(self.data['id'])
+            site = instance
             site.name = self.data['name']
             site.address = self.data['address']
             site.state = self.data['state']
             site.zipcode = self.data['zipcode']
             site.country = self.data['country']
+            
+            logging.info(site)
             
             
             if self.data.get('areas', None):
@@ -264,12 +268,14 @@ class ManageSite(FetchPermissions):
                     site.areas.add(area)
             
             if self.data.get('allowed_users', None):
+                site.allowed_users.clear()
                 for user in self.data['allowed_users']:
-                    site.allowed_users.add(user)
+                    site.allowed_users.add(UserProfile.objects.get(id=user))
                     
             if self.data.get('admin_users', None):
+                site.admin_users.clear()
                 for user in self.data['admin_users']:
-                    site.admin_users.add(user)
+                    site.admin_users.add(UserProfile.objects.get(id=user))
             
             site.save()
             return SiteSerializer(site).data

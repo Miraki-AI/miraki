@@ -207,12 +207,13 @@ class SiteViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'message': 'Error deleting site', 'error': str(e)}, status=400)
     
-    def updated(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         try:
+            instance = self.get_object()
             siteform = SiteForm(request.data)
             if not siteform.is_valid():
                 return Response({'message': 'Error updating site', 'error': siteform.errors}, status=400)
-            site = ManageSite(request).update_site()
+            site = ManageSite(request).update_site(instance)
             return Response(site, status=200)
         except Exception as e:
             logging.error(f"Error updating site: {str(e)}")
