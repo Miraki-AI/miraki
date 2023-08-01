@@ -3,7 +3,7 @@ from .models import *
 from miraki.apps.hub_tenant.base.models import UserProfile
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id', 'name', 'email']
 
 
 

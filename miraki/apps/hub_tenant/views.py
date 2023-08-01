@@ -153,9 +153,8 @@ class SiteViewSet(viewsets.ModelViewSet):
     serializer_class = SiteSerializer
     
     def list(self, request, *args, **kwargs):
-        sites = Site.objects.all()
-        serializer = SiteSerializer(sites, many=True)
-        return Response(serializer.data, status=200)
+        sites = ManageSite(request).get_site()
+        return Response(sites, status=200)
     
 
     @extend_schema(
@@ -207,16 +206,25 @@ class SiteViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Site deleted successfully!'}, status=200)
         except Exception as e:
             return Response({'message': 'Error deleting site', 'error': str(e)}, status=400)
-        
+    
+    def updated(self, request, *args, **kwargs):
+        try:
+            siteform = SiteForm(request.data)
+            if not siteform.is_valid():
+                return Response({'message': 'Error updating site', 'error': siteform.errors}, status=400)
+            site = ManageSite(request).update_site()
+            return Response(site, status=200)
+        except Exception as e:
+            logging.error(f"Error updating site: {str(e)}")
+            return Response({'message': 'Error updating site', 'error': str(e)}, status=400)
         
 class AreaViewSet(viewsets.ModelViewSet):
     queryset = Area.objects.all()
     serializer_class = AreaSerializer
     
     def list(self, request, *args, **kwargs):
-        areas = Area.objects.all()
-        serializer = AreaSerializer(areas, many=True)
-        return Response(serializer.data, status=200)
+        areas = ManageArea(request).get_area()
+        return Response(areas, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -242,9 +250,8 @@ class LineViewSet(viewsets.ModelViewSet):
     serializer_class = LineSerializer
     
     def list(self, request, *args, **kwargs):
-        lines = Line.objects.all()
-        serializer = LineSerializer(lines, many=True)
-        return Response(serializer.data, status=200)
+        lines = ManageLine(request).get_line()
+        return Response(lines, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -257,6 +264,17 @@ class LineViewSet(viewsets.ModelViewSet):
             logging.error(f"Error creating line: {str(e)}")
             return Response({'message': 'Error creating line', 'error': str(e)}, status=400)
     
+    def update(self, request, *args, **kwargs):
+        try:
+            lineform = LineForm(request.data)
+            if not lineform.is_valid():
+                return Response({'message': 'Error updating line', 'error': lineform.errors}, status=400)
+            line = ManageLine(request).update_line()
+            return Response(line, status=200)
+        except Exception as e:
+            logging.error(f"Error updating line: {str(e)}")
+            return Response({'message': 'Error updating line', 'error': str(e)}, status=400)
+        
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -271,9 +289,8 @@ class ProcessViewSet(viewsets.ModelViewSet):
     serializer_class = ProcessSerializer
     
     def list(self, request, *args, **kwargs):
-        processes = Process.objects.all()
-        serializer = ProcessSerializer(processes, many=True)
-        return Response(serializer.data, status=200)
+        processes = ManageProcess(request).get_process()
+        return Response(processes, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -300,9 +317,8 @@ class MachineViewSet(viewsets.ModelViewSet):
     serializer_class = MachineSerializer
     
     def list(self, request, *args, **kwargs):
-        machines = Machine.objects.all()
-        serializer = MachineSerializer(machines, many=True)
-        return Response(serializer.data, status=200)
+        machines = ManageMachine(request).get_machine()
+        return Response(machines, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
