@@ -10,6 +10,21 @@ from miraki.apps.hub_tenant.permissions import Permissions
 from miraki.apps.hub_tenant.forms import *
 from django.core.mail import send_mail
 User = get_user_model()
+class FetchPermissions:
+    def __init__(self,userprofile):
+        self.userprofile = userprofile
+        self.permissions = Permissions(self.userprofile)
+    
+    def get_permissions(self, object=None):
+        try:
+            if object:
+                return Permissions(self.userprofile, object).fetch_permissions()
+            else:
+                return Permissions(self.userprofile).fetch_permissions()
+        except Exception as e:
+            raise Exception(f'Error in getting permissions - {str(e)}')
+        
+
 class ManageUser:
     def __init__(self, request=None):
         if request:
@@ -154,14 +169,13 @@ class ManageUser:
             raise Exception(f'Error in getting user - {str(e)}')
     
 
-class ManageSite:
+class ManageSite(FetchPermissions):
     def __init__(self, request=None):
         self.data = request.data
         self.request = request
         self.userprofile = self.__get_user()
-        self.permissions = Permissions(self.userprofile)
-        
         logging.info(f"Manage Site request: {self.data}")
+        super().__init__(self.userprofile)
         
     
     def __get_user(self):
@@ -177,11 +191,26 @@ class ManageSite:
         try:
             if self.data.get('site_id', None):
                 site = self.get_site_instance_by_id(self.data['site_id'])
-                serializer = SiteSerializer(site)
+                permissions = self.permissions.get_permissions(site)
+                if (
+                    permissions['is_allowed'] or 
+                    permissions['is_admin'] or 
+                    permissions['is_super_admin']
+                ):
+                    serializer = SiteSerializer(site)
+                else:
+                    raise Exception('User not allowed to access this site')
             else:
-                sites = Site.objects.filter(created_by=self.userprofile)
+                # GetAll Sites by User Permission Levels
+                sites = self.permissions.fetch_all_permitted(Site)
+                print(sites)
                 serializer = SiteSerializer(sites, many=True)
-            return serializer.data
+            
+            try:
+                data = serializer.data
+            except:
+                data = serializer.data
+            return data
         except Exception as e:
             raise Exception(f'Error in getting site - {str(e)}')
     
@@ -219,6 +248,33 @@ class ManageSite:
             return serializer.data
         except Exception as e:
             raise Exception(f'Error in creating site - {str(e)}')
+        
+    def update_site(self):
+        try:
+            site = self.get_site_instance_by_id(self.data['id'])
+            site.name = self.data['name']
+            site.address = self.data['address']
+            site.state = self.data['state']
+            site.zipcode = self.data['zipcode']
+            site.country = self.data['country']
+            
+            
+            if self.data.get('areas', None):
+                for area in self.data['areas']:
+                    site.areas.add(area)
+            
+            if self.data.get('allowed_users', None):
+                for user in self.data['allowed_users']:
+                    site.allowed_users.add(user)
+                    
+            if self.data.get('admin_users', None):
+                for user in self.data['admin_users']:
+                    site.admin_users.add(user)
+            
+            site.save()
+            return SiteSerializer(site).data
+        except Exception as e:
+            raise Exception(f'Error in updating site - {str(e)}')
     
     def delete_site(self, instance):
         try:
@@ -246,11 +302,13 @@ class ManageSite:
         
         
         
-class ManageArea:
+class ManageArea(FetchPermissions):
     def __init__(self, request=None):
         self.data = request.data
         self.request = request
+        self.userprofile = self.__get_user()
         logging.info(f"Manage Area request: {self.data}")
+        super().__init__(self.userprofile)
     
     def __get_user(self):
         return UserProfile.objects.get(user=self.request.user)
@@ -260,6 +318,27 @@ class ManageArea:
             return Area.objects.get(id=area_id)
         except Exception as e:
             raise Exception(f'Error in getting area by id - {str(e)}')
+        
+    def get_area(self):
+        try:
+            if self.data.get('area_id', None):
+                area = self.get_area_instance_by_id(self.data['area_id'])
+                permissions = self.permissions.get_permissions(area)
+                if (
+                    permissions['is_allowed'] or 
+                    permissions['is_admin'] or 
+                    permissions['is_super_admin']
+                ):
+                    serializer = SiteSerializer(area)
+                else:
+                    raise Exception('User not allowed to access this site')
+            else:
+                # GetAll Areas by User Permission Levels
+                areas = self.permissions.fetch_all_permitted(Area)
+                serializer = AreaSerializer(areas, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting area - {str(e)}')
     
     def create_area(self):
         try:
@@ -315,11 +394,14 @@ class ManageArea:
             raise Exception(f'Error in updating lines - {str(e)}')        
         
 
-class ManageLine:
+class ManageLine(FetchPermissions):
     def __init__(self, request):
         self.data = request.data
         self.request = request
+        self.userprofile = self.__get_user()
         logging.info(f"Manage Line request: {self.data}")
+        super().__init__(self.userprofile)
+        
     
     def __get_user(self):
         return UserProfile.objects.get(user=self.request.user)
@@ -329,6 +411,27 @@ class ManageLine:
             return Line.objects.get(id=line_id)
         except Exception as e:
             raise Exception(f'Error in getting line by id - {str(e)}')
+        
+    def get_line(self):
+        try:
+            if self.data.get('line_id', None):
+                line = self.get_line_instance_by_id(self.data['line_id'])
+                permissions = self.permissions.get_permissions(line)
+                if (
+                    permissions['is_allowed'] or 
+                    permissions['is_admin'] or 
+                    permissions['is_super_admin']
+                ):
+                    serializer = SiteSerializer(line)
+                else:
+                    raise Exception('User not allowed to access this site')
+            else:
+                # GetAll Lines by User Permission Levels
+                lines = self.permissions.fetch_all_permitted(Line)
+                serializer = LineSerializer(lines, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting line - {str(e)}')
     
     def create_line(self):
         try:
@@ -353,6 +456,9 @@ class ManageLine:
             return serializer.data
         except Exception as e:
             raise Exception(f'Error in creating line - {str(e)}')
+        
+    def update_line(self):
+        pass
     
     def delete_line(self, instance):
         try:
@@ -382,12 +488,13 @@ class ManageLine:
             raise Exception(f'Error in updating processes - {str(e)}')
         
         
-class ManageProcess:
+class ManageProcess(FetchPermissions):
     def __init__(self, request):
         self.request = request
         self.data = request.data
-        
+        self.userprofile = self.__get_user()
         logging.info(f"Manage Process request: {self.data}")
+        super().__init__(self.userprofile)
     
     def __get_user(self):
         return UserProfile.objects.get(user=self.request.user)
@@ -397,6 +504,27 @@ class ManageProcess:
             return Process.objects.get(id=process_id)
         except Exception as e:
             raise Exception(f'Error in getting process by id - {str(e)}')
+        
+    def get_process(self):
+        try:
+            if self.data.get('process_id', None):
+                process = self.get_process_instance_by_id(self.data['process_id'])
+                permissions = self.permissions.get_permissions(process)
+                if (
+                    permissions['is_allowed'] or 
+                    permissions['is_admin'] or 
+                    permissions['is_super_admin']
+                ):
+                    serializer = SiteSerializer(process)
+                else:
+                    raise Exception('User not allowed to access this site')
+            else:
+                # GetAll Processes by User Permission Levels
+                processes = self.permissions.fetch_all_permitted(Process)
+                serializer = ProcessSerializer(processes, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting process - {str(e)}')
         
     def create_process(self):
         try:
@@ -450,12 +578,13 @@ class ManageProcess:
         except Exception as e:
             raise Exception(f'Error in updating machines - {str(e)}')
         
-class ManageMachine:
+class ManageMachine(FetchPermissions):
     def __init__(self, request):
         self.request = request
         self.data = request.data
-        
+        self.userprofile = self.__get_user()
         logging.info(f"Manage Machine request: {self.data}")
+        super().__init__(self.userprofile)
         
     def __get_user(self):
         try:
@@ -468,6 +597,27 @@ class ManageMachine:
             return Machine.objects.get(id=machine_id)
         except Exception as e:
             raise Exception(f'Error in getting machine by id - {str(e)}')
+        
+    def get_machine(self):
+        try:
+            if self.data.get('machine_id', None):
+                machine = self.get_machine_instance_by_id(self.data['machine_id'])
+                permissions = self.permissions.get_permissions(machine)
+                if (
+                    permissions['is_allowed'] or 
+                    permissions['is_admin'] or 
+                    permissions['is_super_admin']
+                ):
+                    serializer = SiteSerializer(machine)
+                else:
+                    raise Exception('User not allowed to access this site')
+            else:
+                # GetAll Machines by User Permission Levels
+                machines = self.permissions.fetch_all_permitted(Machine)
+                serializer = MachineSerializer(machines, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting machine - {str(e)}')
         
     def create_machine(self):
         try:

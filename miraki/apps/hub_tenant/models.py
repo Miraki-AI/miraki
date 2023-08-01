@@ -182,6 +182,7 @@ class Site(UserRolesUUIDTimeStampedModel):
     longitude = models.CharField(max_length=100, blank=True, null=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     areas = models.ManyToManyField(Area, blank=True)
+    status = models.BooleanField(default=True)
     
     
     def __str__(self):

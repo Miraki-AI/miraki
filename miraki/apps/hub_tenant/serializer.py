@@ -57,6 +57,7 @@ class MachineTypeModelSerializer(serializers.ModelSerializer):
     machine_type_model = serializers.SerializerMethodField()
     allowed_users = UserProfileSerializer(many=True, read_only=True)
     admin_users = UserProfileSerializer(many=True, read_only=True)
+    created_by = UserProfileSerializer()
 
     def get_machine_type_model(self, obj):
         machine_type_model = obj.machine_type_model.model_class()
