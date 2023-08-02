@@ -187,12 +187,11 @@ class ManageSite(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting site by id - {str(e)}')
     
-    def get_site(self):
-        logging.info("geeting sites")
+    def get_site(self, pk=None):
         try:
-            if self.data.get('site_id', None):
-                site = self.get_site_instance_by_id(self.data['site_id'])
-                permissions = self.permissions.get_permissions(site)
+            if pk:
+                site = self.get_site_instance_by_id(pk)
+                permissions = self.get_permissions(site)
                 if (
                     permissions['is_allowed'] or 
                     permissions['is_admin'] or 
@@ -214,6 +213,7 @@ class ManageSite(FetchPermissions):
             return data
         except Exception as e:
             raise Exception(f'Error in getting site - {str(e)}')
+
     
     def create_site(self):
         try:
@@ -325,11 +325,11 @@ class ManageArea(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting area by id - {str(e)}')
         
-    def get_area(self):
+    def get_area(self, pk=None):
         try:
-            if self.data.get('area_id', None):
-                area = self.get_area_instance_by_id(self.data['area_id'])
-                permissions = self.permissions.get_permissions(area)
+            if pk:
+                area = self.get_area_instance_by_id(pk)
+                permissions = self.get_permissions(area)
                 if (
                     permissions['is_allowed'] or 
                     permissions['is_admin'] or 
@@ -418,11 +418,11 @@ class ManageLine(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting line by id - {str(e)}')
         
-    def get_line(self):
+    def get_line(self, pk=None):
         try:
-            if self.data.get('line_id', None):
-                line = self.get_line_instance_by_id(self.data['line_id'])
-                permissions = self.permissions.get_permissions(line)
+            if pk:
+                line = self.get_line_instance_by_id(pk)
+                permissions = self.get_permissions(line)
                 if (
                     permissions['is_allowed'] or 
                     permissions['is_admin'] or 
@@ -511,11 +511,11 @@ class ManageProcess(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting process by id - {str(e)}')
         
-    def get_process(self):
+    def get_process(self, pk=None):
         try:
-            if self.data.get('process_id', None):
-                process = self.get_process_instance_by_id(self.data['process_id'])
-                permissions = self.permissions.get_permissions(process)
+            if pk:
+                process = self.get_process_instance_by_id(pk)
+                permissions = self.get_permissions(process)
                 if (
                     permissions['is_allowed'] or 
                     permissions['is_admin'] or 
@@ -604,11 +604,11 @@ class ManageMachine(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting machine by id - {str(e)}')
         
-    def get_machine(self):
+    def get_machine(self, pk=None):
         try:
-            if self.data.get('machine_id', None):
-                machine = self.get_machine_instance_by_id(self.data['machine_id'])
-                permissions = self.permissions.get_permissions(machine)
+            if pk:
+                machine = self.get_machine_instance_by_id(pk)
+                permissions = self.get_permissions(machine)
                 if (
                     permissions['is_allowed'] or 
                     permissions['is_admin'] or 
