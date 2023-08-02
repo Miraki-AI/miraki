@@ -152,6 +152,12 @@ class SiteViewSet(viewsets.ModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        site = ManageSite(request).get_site(object_id)
+        return Response(site, status=200)
+    
     def list(self, request, *args, **kwargs):
         sites = ManageSite(request).get_site()
         return Response(sites, status=200)
@@ -223,6 +229,12 @@ class AreaViewSet(viewsets.ModelViewSet):
     queryset = Area.objects.all()
     serializer_class = AreaSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        data = ManageArea(request).get_area(object_id)
+        return Response(data, status=200)
+    
     def list(self, request, *args, **kwargs):
         areas = ManageArea(request).get_area()
         return Response(areas, status=200)
@@ -249,6 +261,12 @@ class AreaViewSet(viewsets.ModelViewSet):
 class LineViewSet(viewsets.ModelViewSet):
     queryset = Line.objects.all()
     serializer_class = LineSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        data = ManageLine(request).get_line(object_id)
+        return Response(data, status=200)
     
     def list(self, request, *args, **kwargs):
         lines = ManageLine(request).get_line()
@@ -289,6 +307,12 @@ class ProcessViewSet(viewsets.ModelViewSet):
     queryset = Process.objects.all()
     serializer_class = ProcessSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        data = ManageProcess(request).get_process(object_id)
+        return Response(data, status=200)
+    
     def list(self, request, *args, **kwargs):
         processes = ManageProcess(request).get_process()
         return Response(processes, status=200)
@@ -316,6 +340,12 @@ class ProcessViewSet(viewsets.ModelViewSet):
 class MachineViewSet(viewsets.ModelViewSet):
     queryset = Machine.objects.all()
     serializer_class = MachineSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        data = ManageMachine(request).get_machine(object_id)
+        return Response(data, status=200)
     
     def list(self, request, *args, **kwargs):
         machines = ManageMachine(request).get_machine()
