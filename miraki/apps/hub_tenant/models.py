@@ -166,6 +166,7 @@ class Line(UserRolesUUIDTimeStampedModel):
         return self.name
 class Area(UserRolesUUIDTimeStampedModel):
     name = models.CharField(max_length=100)
+    site_id = models.UUIDField(blank=True, null=True)
     lines = models.ManyToManyField(Line, blank=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     def __str__(self):
@@ -182,8 +183,18 @@ class Site(UserRolesUUIDTimeStampedModel):
     longitude = models.CharField(max_length=100, blank=True, null=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     areas = models.ManyToManyField(Area, blank=True)
+    status = models.BooleanField(default=True)
     
     
     def __str__(self):
         return self.name
 
+
+class MyDashboard(UUIDTimeStampedModel):
+    name = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=False)
+    created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    widgets = models.JSONField(default=dict)
+    
+    def __str__(self):
+        return self.name

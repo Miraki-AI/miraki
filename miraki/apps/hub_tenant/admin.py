@@ -3,7 +3,7 @@ from .models import *
 from miraki.apps.hub_tenant.base.models import UserProfile
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id', 'name', 'email']
 
 
 
@@ -67,3 +67,8 @@ class TagTopicsAdmin(admin.ModelAdmin):
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ['id', 'space_name', 'org_name', 'address', 'org_img']
+    
+
+@admin.register(MyDashboard)
+class MyDashboardAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'created_by', 'widgets', 'is_default']

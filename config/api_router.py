@@ -17,6 +17,8 @@ router.register("lines", LineViewSet)
 router.register("processes", ProcessViewSet)
 router.register("machines", MachineViewSet)
 router.register("tags", TagTopicsViewSet)
+router.register("my-dashboard", MyDashboardViewSet)
+
 
 
 app_name = "api"
