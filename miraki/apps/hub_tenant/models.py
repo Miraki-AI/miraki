@@ -166,6 +166,7 @@ class Line(UserRolesUUIDTimeStampedModel):
         return self.name
 class Area(UserRolesUUIDTimeStampedModel):
     name = models.CharField(max_length=100)
+    site_id = models.UUIDField(blank=True, null=True)
     lines = models.ManyToManyField(Line, blank=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     def __str__(self):

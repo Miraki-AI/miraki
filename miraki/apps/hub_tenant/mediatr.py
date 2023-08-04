@@ -379,6 +379,36 @@ class ManageArea(FetchPermissions):
             return True
         except Exception as e:
             raise Exception(f'Error in deleting area - {str(e)}')
+        
+    def update_area(self, instance):
+        try:
+            instance.name = self.data['name']
+            instance.site_id = self.data['site_id']
+            instance.save()
+            
+            if self.data.get('allowed_users', None):
+                instance.allowed_users.clear()
+                for user in self.data['allowed_users']:
+                    instance.allowed_users.add(user)
+                    
+            if self.data.get('admin_users', None):
+                instance.admin_users.clear()
+                for user in self.data['admin_users']:
+                    instance.admin_users.add(user)
+                    
+            if self.data.get('lines', None):
+                instance.lines.clear()
+                for line in self.data['lines']:
+                    instance.lines.add(line)
+                    
+            instance.save()
+            
+            area = AreaSerializer(instance).data
+            return area
+            
+        except Exception as e:
+            raise Exception(f'Error in updating area - {str(e)}')
+            
     
     def _map_area_to_site(self,area):
         try:

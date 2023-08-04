@@ -109,7 +109,7 @@ class LineForm(forms.Form):
 
 class AreaForm(forms.Form):
     name = forms.CharField(max_length=100)
-    site = forms.UUIDField()
+    site_id = forms.UUIDField()
     lines = forms.ModelMultipleChoiceField(queryset=Line.objects.all(), required=False)
     allowed_users = ArrayField(forms.UUIDField())
     admin_users = ArrayField(forms.UUIDField())
