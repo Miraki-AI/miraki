@@ -257,6 +257,18 @@ class AreaViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Area deleted successfully!'}, status=200)
         except Exception as e:
             return Response({'message': 'Error deleting area', 'error': str(e)}, status=400)
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            areaform = AreaForm(request.data)
+            if not areaform.is_valid():
+                return Response({'message': 'Error updating area', 'error': areaform.errors}, status=400)
+            area = ManageArea(request).update_area(instance)
+            return Response(area, status=200)
+        except Exception as e:
+            logging.error(f"Error updating area: {str(e)}")
+            return Response({'message': 'Error updating area', 'error': str(e)}, status=400)
     
 class LineViewSet(viewsets.ModelViewSet):
     queryset = Line.objects.all()
