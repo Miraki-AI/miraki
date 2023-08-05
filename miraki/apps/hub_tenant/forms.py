@@ -96,15 +96,19 @@ class ProcessForm(forms.Form):
     next_process = forms.ModelChoiceField(queryset=Process.objects.all(), required=False)
     process_type = forms.CharField(max_length=100)
     allowed_users = ArrayField(forms.UUIDField())
-    admin_users = ArrayField(forms.UUIDField())
-    line = forms.UUIDField()    
+    admin_users = ArrayField(forms.UUIDField())    
+    line_id = forms.UUIDField()
+    area_id = forms.UUIDField()
+    site_id = forms.UUIDField()
+    
 
 class LineForm(forms.Form):
     name = forms.CharField(max_length=100)
     processes = forms.ModelMultipleChoiceField(queryset=Process.objects.all(), required=False)
     allowed_users = ArrayField(forms.UUIDField())
     admin_users = ArrayField(forms.UUIDField())
-    area = forms.UUIDField()
+    area_id = forms.UUIDField()
+    site_id = forms.UUIDField()
 
 
 class AreaForm(forms.Form):
