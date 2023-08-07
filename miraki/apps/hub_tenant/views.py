@@ -231,8 +231,14 @@ class AreaViewSet(viewsets.ModelViewSet):
     
     def retrieve(self, request, *args, **kwargs):
         # The Primary Key of the object is passed to the retrieve method through self.kwargs
-        object_id = self.kwargs['pk']
-        data = ManageArea(request).get_area(object_id)
+        object_id = self.kwargs.get('pk', None)
+        site_id = request.query_params.get('site_id', None)
+        if object_id:
+            data = ManageArea(request).get_area(object_id)
+        #if query params are passed, then return the filtered data
+        if site_id:
+            data = ManageArea(request).get_areas_by_site_id(site_id)
+        
         return Response(data, status=200)
     
     def list(self, request, *args, **kwargs):

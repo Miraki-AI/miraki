@@ -344,6 +344,14 @@ class ManageArea(FetchPermissions):
             return serializer.data
         except Exception as e:
             raise Exception(f'Error in getting area - {str(e)}')
+        
+    def get_areas_by_site(self, site_id):
+        try:
+            areas = Area.objects.filter(site_id=site_id)
+            serializer = AreaSerializer(areas, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting areas by site - {str(e)}')
     
     def create_area(self):
         try:
