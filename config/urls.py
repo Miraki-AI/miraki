@@ -47,6 +47,7 @@ urlpatterns += [
     path("core/api/invite-user/", InviteUserApi.as_view(), name="invite-user" ),
     path("core/api/is-user-exists/", IsUserExists.as_view(), name="is-user-exists" ),
     path("core/api/onboard-user/", UserOnboardApi.as_view(), name="onboard-user" ),
+    path("core/api/process-choices/", ProcessChoicesView.as_view(), name="process-choices" ),
     
     
 ]

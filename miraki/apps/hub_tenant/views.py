@@ -439,3 +439,10 @@ class MyDashboardViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'message': 'Error deleting dashboard', 'error': str(e)}, status=400)
             
+
+# Choices List APi's
+
+class ProcessChoicesView(APIView):
+    def get(self, request, format=None):
+        choices = ManageProcess(request).get_process_choices()
+        return Response(choices, status=200)

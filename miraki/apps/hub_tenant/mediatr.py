@@ -570,6 +570,14 @@ class ManageProcess(FetchPermissions):
             return Process.objects.get(id=process_id)
         except Exception as e:
             raise Exception(f'Error in getting process by id - {str(e)}')
+    
+    def get_process_choices(self):
+        choices = []
+        choices_dict = dict(Process.process_type.field.choices)
+        
+        for key, value in choices_dict.items():
+            choices.append(dict(id=key, name=value))
+        return choices
         
     def get_process(self, pk=None):
         try:
