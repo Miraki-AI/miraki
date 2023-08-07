@@ -18,6 +18,7 @@ router.register("processes", ProcessViewSet)
 router.register("machines", MachineViewSet)
 router.register("tags", TagTopicsViewSet)
 router.register("my-dashboard", MyDashboardViewSet)
+router.register("sites/<int:pk>",SiteViewSet)
 
 
 

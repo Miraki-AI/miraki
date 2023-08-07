@@ -345,13 +345,13 @@ class ManageArea(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting area - {str(e)}')
         
-    def get_areas_by_site(self, site_id):
+    def get_areas_by_site_id(self, site_id):
         try:
             areas = Area.objects.filter(site_id=site_id)
             serializer = AreaSerializer(areas, many=True)
             return serializer.data
         except Exception as e:
-            raise Exception(f'Error in getting areas by site - {str(e)}')
+            raise Exception(f'Error in getting areas by site_id - {str(e)}')
     
     def create_area(self):
         try:
@@ -456,6 +456,16 @@ class ManageLine(FetchPermissions):
             return Line.objects.get(id=line_id)
         except Exception as e:
             raise Exception(f'Error in getting line by id - {str(e)}')
+    
+    def get_lines_by_area_id(self,area_id):
+        try :
+            lines = Line.objects.filter(area_id = area_id)
+            serializer = LineSerializer(lines, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting lines by area_id - {str(e)}')
+        
+
         
     def get_line(self, pk=None):
         try:
@@ -717,6 +727,14 @@ class ManageMachine(FetchPermissions):
             return Machine.objects.get(id=machine_id)
         except Exception as e:
             raise Exception(f'Error in getting machine by id - {str(e)}')
+    
+    def get_machine_choices(self):
+        choices = []
+        choices_dict = dict(Machine.machine_type.field.choices)
+        
+        for key, value in choices_dict.items():
+            choices.append(dict(id=key, name=value))
+        return choices
         
     def get_machine(self, pk=None):
         try:

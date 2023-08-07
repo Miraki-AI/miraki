@@ -283,7 +283,11 @@ class LineViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         # The Primary Key of the object is passed to the retrieve method through self.kwargs
         object_id = self.kwargs['pk']
-        data = ManageLine(request).get_line(object_id)
+        area_id = request.query_params.get(area_id,None)
+        if object_id :
+            data = ManageLine(request).get_line(object_id)
+        if area_id:
+            data = ManageLine.get_line_instance_by_id(area_id)
         return Response(data, status=200)
     
     def list(self, request, *args, **kwargs):
@@ -392,6 +396,7 @@ class MachineViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logging.error(f"Error creating machine: {str(e)}")
             return Response({'message': 'Error creating machine', 'error': str(e)}, status=400)
+    
 
 class TagTopicsViewSet(viewsets.ModelViewSet):
     queryset = TagTopics.objects.all()
@@ -451,4 +456,9 @@ class MyDashboardViewSet(viewsets.ModelViewSet):
 class ProcessChoicesView(APIView):
     def get(self, request, format=None):
         choices = ManageProcess(request).get_process_choices()
+        return Response(choices, status=200)
+
+class MachineChoicesView(APIView):
+    def get(self, request, format=None):
+        choices = ManageMachine(request).get_machine_choices()
         return Response(choices, status=200)
