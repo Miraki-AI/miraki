@@ -297,10 +297,11 @@ class LineViewSet(viewsets.ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         try:
+            instance = self.get_object()
             lineform = LineForm(request.data)
             if not lineform.is_valid():
                 return Response({'message': 'Error updating line', 'error': lineform.errors}, status=400)
-            line = ManageLine(request).update_line()
+            line = ManageLine(request).update_line(instance)
             return Response(line, status=200)
         except Exception as e:
             logging.error(f"Error updating line: {str(e)}")
@@ -339,6 +340,18 @@ class ProcessViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logging.error(f"Error creating process: {str(e)}")
             return Response({'message': 'Error creating process', 'error': str(e)}, status=400)
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            processform = ProcessForm(request.data)
+            if not processform.is_valid():
+                return Response({'message': 'Error updating process', 'error': processform.errors}, status=400)
+            process = ManageProcess(request).update_processes(instance)
+            return Response(process, status=200)
+        except Exception as e:
+            logging.error(f"Error updating process: {str(e)}")
+            return Response({'message': 'Error updating process', 'error': str(e)}, status=400)
 
     def destroy(self, request, *args, **kwargs):
         try:

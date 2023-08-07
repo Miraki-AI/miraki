@@ -290,13 +290,12 @@ class ManageSite(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in deleting site - {str(e)}')
     
-    def update_area(self, areas, id=None):
+    def update_area(self, area, id=None):
         try:
             if id:
                 site = self.get_site_instance_by_id(id)
-                for area in areas:
-                    print(area, type(area))
-                    site.areas.add(area)
+                area = dict(area)
+                site.areas.add(area['id'])
                 site.save()
             else:
                 #TODO: flexibility to get called from create_site()
@@ -350,7 +349,8 @@ class ManageArea(FetchPermissions):
         try:
             area = Area(
                 name=self.data['name'],
-                created_by=self.__get_user()
+                created_by=self.__get_user(),
+                site_id = self.data['site_id']
             )
             
             area.save()
@@ -363,12 +363,13 @@ class ManageArea(FetchPermissions):
             
             area.save()
                     
-            serializer = AreaSerializer(area)
+            area = AreaSerializer(area).data
             
             #Map this area to site requested for creation
-            self._map_area_to_site(str(area.id))
+            print(area)
+            self._map_area_to_site(area)
             
-            return serializer.data
+            return area
         except Exception as e:
             raise Exception(f'Error in creating area - {str(e)}')
     
@@ -412,17 +413,17 @@ class ManageArea(FetchPermissions):
     
     def _map_area_to_site(self,area):
         try:
-            ManageSite(self.request).update_area([area],id=self.data['site'])
+            ManageSite(self.request).update_area(area,id=self.data['site_id'])
         except Exception as e:
             raise Exception(f'Error in mapping area to site - {str(e)}')
     
-    def update_lines(self, lines, id=None):
+    def update_lines(self, line, id=None):
         try:
             if id:
                 area = self.get_area_instance_by_id(id)
-                for line in lines:
-                    area.lines.add(line)
+                area.lines.add(line['id'])
                 area.save()
+
             else:
                 #TODO: flexibility to get called from create_area()
                 pass
@@ -451,14 +452,14 @@ class ManageLine(FetchPermissions):
     def get_line(self, pk=None):
         try:
             if pk:
-                line = self.get_line_instance_by_id(pk)
+                line = self.get_line_instance_by_id(pk)    
                 permissions = self.get_permissions(line)
                 if (
                     permissions['is_allowed'] or 
                     permissions['is_admin'] or 
                     permissions['is_super_admin']
                 ):
-                    serializer = SiteSerializer(line)
+                    serializer = AreaSerializer(line)
                 else:
                     raise Exception('User not allowed to access this site')
             else:
@@ -473,10 +474,13 @@ class ManageLine(FetchPermissions):
         try:
             line = Line(
                 name=self.data['name'],
-                created_by=self.__get_user()
+                created_by=self.__get_user(),
+                area_id = self.data['area_id'],
+                site_id = self.data['site_id']
             )
             
             line.save()
+            print(line)
             if self.data.get('allowed_users', None):
                 for user in self.data['allowed_users']:
                     line.allowed_users.add(user)
@@ -485,16 +489,43 @@ class ManageLine(FetchPermissions):
                     line.admin_users.add(user)
             
             line.save()
-            serializer = LineSerializer(line)
+            line = LineSerializer(line).data
             #Map this area to site requested for creation
-            self._map_line_to_area(str(line.id))
+            self._map_line_to_area(dict(line))
             
-            return serializer.data
+            return line
         except Exception as e:
             raise Exception(f'Error in creating line - {str(e)}')
         
-    def update_line(self):
-        pass
+    def update_line(self, instance):
+        try:
+            instance.name = self.data['name']
+            instance.site_id = self.data['site_id']
+            instance.area_id = self.data['area_id']
+            instance.save()
+            
+            if self.data.get('allowed_users', None):
+                instance.allowed_users.clear()
+                for user in self.data['allowed_users']:
+                    instance.allowed_users.add(user)
+                    
+            if self.data.get('admin_users', None):
+                instance.admin_users.clear()
+                for user in self.data['admin_users']:
+                    instance.admin_users.add(user)
+                    
+            if self.data.get('areas', None):
+                instance.lines.clear()
+                for line in self.data['lines']:
+                    instance.lines.add(line)
+                    
+            instance.save()
+            
+            line = LineSerializer(instance).data
+            return line
+            
+        except Exception as e:
+            raise Exception(f'Error in updating line - {str(e)}')
     
     def delete_line(self, instance):
         try:
@@ -506,16 +537,15 @@ class ManageLine(FetchPermissions):
     
     def _map_line_to_area(self,line):
         try:
-            ManageArea(self.request).update_lines([line],id=self.data['area'])
+            ManageArea(self.request).update_lines(line,id=self.data['area_id'])
         except Exception as e:
             raise Exception(f'Error in mapping line to area - {str(e)}')
         
-    def update_processes(self, processes, id=None):
+    def update_processes(self, process, id=None):
         try:
             if id:
                 line = self.get_line_instance_by_id(id)
-                for process in processes:
-                    line.processes.add(Process.objects.get(id=process))
+                line.processes.add(process['id'])
                 line.save()
             else:
                 #TODO: flexibility to get called from create_line()
@@ -566,10 +596,15 @@ class ManageProcess(FetchPermissions):
         try:
             process = Process(
                 name=self.data['name'],
-                created_by=self.__get_user()
+                created_by=self.__get_user(),
+                line_id = self.data['line_id'],
+                area_id = self.data['area_id'],
+                site_id = self.data['site_id'],
+                process_type = self.data['process_type']
             )
             
             process.save()
+            
             if self.data.get('allowed_users', None):
                 for user in self.data['allowed_users']:
                     process.allowed_users.add(user)
@@ -578,14 +613,47 @@ class ManageProcess(FetchPermissions):
                     process.admin_users.add(user)
             
             process.save()
-            serializer = ProcessSerializer(process)
+            print(process)
+            process = ProcessSerializer(process).data
             #Map this area to site requested for creation
-            self._map_process_to_line(str(process.id))
-            
-            return serializer.data
+            self._map_process_to_line(dict(process))      
+            return process
         except Exception as e:
             logging.error(f'Error in creating process - {str(e)}')
             raise Exception(f'Error in creating process - {str(e)}')
+    
+    def update_processes(self, instance):
+        try:
+            instance.name = self.data['name']
+            instance.line_id = self.data['line_id']
+            instance.site_id = self.data['site_id']
+            instance.area_id = self.data['area_id']
+            instance.process_type = self.data['process_type']
+            instance.save()
+            
+            if self.data.get('allowed_users', None):
+                instance.allowed_users.clear()
+                for user in self.data['allowed_users']:
+                    instance.allowed_users.add(user)
+                    
+            if self.data.get('admin_users', None):
+                instance.admin_users.clear()
+                for user in self.data['admin_users']:
+                    instance.admin_users.add(user)
+                    
+            if self.data.get('lines', None):
+                instance.processes.clear()
+                for process in self.data['processes']:
+                    instance.processes.add(process)
+                    
+            instance.save()
+            
+            process = ProcessSerializer(instance).data
+            return process
+            
+        except Exception as e:
+            raise Exception(f'Error in updating process - {str(e)}')
+    
         
     def delete_process(self, instance):
         try:
@@ -598,7 +666,7 @@ class ManageProcess(FetchPermissions):
     
     def _map_process_to_line(self,process):
         try:
-            ManageLine(self.request).update_processes([process],id=self.data['line'])
+            ManageLine(self.request).update_processes(process,id=self.data['line_id'])
         except Exception as e:
             raise Exception(f'Error in mapping process to line - {str(e)}')
         
