@@ -83,9 +83,7 @@ class EdgeDeviceForm(forms.Form):
 class TagTopicsForm(forms.Form):
     name = forms.CharField(max_length=100)
     topic = forms.CharField(max_length=100)
-    value = forms.CharField(max_length=100)
-    allowed_users = ArrayField(forms.UUIDField())
-    admin_users = ArrayField(forms.UUIDField())
+    value = forms.CharField(max_length=100)    
     process = models.ForeignKey(Process, on_delete=models.CASCADE, blank=True, null=True)
     site_id = models.UUIDField(blank=True, null=True)
     area_id = models.UUIDField(blank=True, null=True)

@@ -649,7 +649,7 @@ class ManageProcess(FetchPermissions):
             process.save()
             print(process)
             process = ProcessSerializer(process).data
-            #Map this area to site requested for creation
+            #Map this process to line requested for creation
             self._map_process_to_line(dict(process))      
             return process
         except Exception as e:
@@ -839,6 +839,88 @@ class ManageMachine(FetchPermissions):
             
         except Exception as e:
             raise Exception(f'Error in updating machine - {str(e)}')
+
+class ManageTagTopics(FetchPermissions):
+    def __init__(self, request):
+        self.request = request
+        self.data = request.data
+        self.userprofile = self.__get_user()
+        logging.info(f"Manage TagTopics request: {self.data}")
+        super().__init__(self.userprofile)
+    
+    def __get_user(self):
+        return UserProfile.objects.get(user=self.request.user)
+    
+    def get_tagtopics_instance_by_id(self, tag_id):
+        try:
+            return TagTopics.objects.get(id=tag_id)
+        except Exception as e:
+            raise Exception(f'Error in getting tag by id - {str(e)}')
+        
+    def get_tags(self, pk=None):
+        try:
+            if pk:
+                tag = self.get_tagtopics_instance_by_id(pk)
+                permissions = self.get_permissions(tag)
+                if (
+                    permissions['is_allowed'] or 
+                    permissions['is_admin'] or 
+                    permissions['is_super_admin']
+                ):
+                    serializer = SiteSerializer(tag)
+                else:
+                    raise Exception('User not allowed to access this site')
+            else:
+                # GetAll tags by User Permission Levels
+                tags = self.permissions.fetch_all_permitted(TagTopics)
+                serializer = TagTopicsSerializer(tags, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting tags - {str(e)}')
+        
+    def create_tagtopics(self):
+        try:
+            tagtopics = TagTopics(
+                name = self.data['name'], 
+                machine_id = self.data['machine_id'],
+                area_id = self.data['area_id'],
+                site_id = self.data['site_id'],
+                line_id = self.data['line_id'],
+                value = self.data['value'],
+                topic = self.data['topic']              
+            )           
+            tagtopics.save()
+            print(tagtopics)
+            serializer = TagTopicsSerializer(tagtopics)
+            return serializer.data
+        except Exception as e:
+            logging.error(f'Error in creating tags - {str(e)}')
+            raise Exception(f'Error in creating tags hii - {str(e)}')
+    
+    def update_tagtopics(self, instance):
+        try:
+            instance.name = self.data['name']
+            instance.line_id = self.data['line_id']
+            instance.site_id = self.data['site_id']
+            instance.area_id = self.data['area_id']
+            instance.machine_id = self.data['machine_id']
+            instance.value = self.data['value']
+            instance.topic = self.data['topic']
+            instance.save()      
+            tags = TagTopicsSerializer(instance).data
+            return tags
+            
+        except Exception as e:
+            raise Exception(f'Error in updating tags - {str(e)}')
+    
+        
+    def delete_tags(self, instance):
+        try:
+            #check_permissions
+            instance.delete()
+            return True
+        except Exception as e:
+            raise Exception(f'Error in deleting tags - {str(e)}')
                  
 
 class ManageOrganization:
