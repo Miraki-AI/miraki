@@ -80,13 +80,18 @@ class EdgeDeviceForm(forms.Form):
     machine = forms.ModelChoiceField(queryset=Machine.objects.all())
 
 
-
-
-
 class TagTopicsForm(forms.Form):
     name = forms.CharField(max_length=100)
     topic = forms.CharField(max_length=100)
     value = forms.CharField(max_length=100)
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
+    process = models.ForeignKey(Process, on_delete=models.CASCADE, blank=True, null=True)
+    site_id = models.UUIDField(blank=True, null=True)
+    area_id = models.UUIDField(blank=True, null=True)
+    line_id = models.UUIDField(blank=True, null=True)
+    machine_id = models.UUIDField(blank=True, null=True)
+    description = models.TextField(max_length = 100, default = "")
 
 
 class ProcessForm(forms.Form):
@@ -100,6 +105,7 @@ class ProcessForm(forms.Form):
     line_id = forms.UUIDField()
     area_id = forms.UUIDField()
     site_id = forms.UUIDField()
+    description = forms.CharField(max_length=100)
     
 
 class LineForm(forms.Form):
@@ -109,6 +115,7 @@ class LineForm(forms.Form):
     admin_users = ArrayField(forms.UUIDField())
     area_id = forms.UUIDField()
     site_id = forms.UUIDField()
+    description = forms.CharField(max_length=100)
 
 
 class AreaForm(forms.Form):
@@ -117,6 +124,7 @@ class AreaForm(forms.Form):
     lines = forms.ModelMultipleChoiceField(queryset=Line.objects.all(), required=False)
     allowed_users = ArrayField(forms.UUIDField())
     admin_users = ArrayField(forms.UUIDField())
+    description = forms.CharField(max_length=100)
 
 class SiteForm(forms.Form):
     name = forms.CharField(max_length=100)
@@ -127,3 +135,4 @@ class SiteForm(forms.Form):
     areas = forms.ModelMultipleChoiceField(queryset=Area.objects.all(), required=False)
     allowed_users = ArrayField(forms.UUIDField())
     admin_users = ArrayField(forms.UUIDField())
+    description = forms.CharField(max_length=100)

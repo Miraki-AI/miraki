@@ -333,7 +333,11 @@ class ProcessViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         # The Primary Key of the object is passed to the retrieve method through self.kwargs
         object_id = self.kwargs['pk']
-        data = ManageProcess(request).get_process(object_id)
+        line_id = request.queryset_params(line_id, None)
+        if object_id:
+            data = ManageProcess(request).get_process(object_id)
+        if line_id :
+            line = ManageProcess.get_processes_by_line_id(line_id)
         return Response(data, status=200)
     
     def list(self, request, *args, **kwargs):
@@ -397,6 +401,26 @@ class MachineViewSet(viewsets.ModelViewSet):
             logging.error(f"Error creating machine: {str(e)}")
             return Response({'message': 'Error creating machine', 'error': str(e)}, status=400)
     
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageMachine(request).delete_machine(instance)
+            return Response({'message': 'Machine deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting machine', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            machineform = MachineForm(request.data)
+            if not machineform.is_valid():
+                return Response({'message': 'Error updating machine', 'error': machineform.errors}, status=400)
+            machine = ManageMachine(request).update_machines(instance)
+            return Response(machine, status=200)
+        except Exception as e:
+            logging.error(f"Error updating machine: {str(e)}")
+            return Response({'message': 'Error updating machine', 'error': str(e)}, status=400)
+    
 
 class TagTopicsViewSet(viewsets.ModelViewSet):
     queryset = TagTopics.objects.all()
@@ -410,9 +434,63 @@ class TagTopicsViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = request.data
         logging.info(f"Tag Topics data: {data}")
-        tag_topics = TagTopics.objects.create(name=data['name'], machine_id=data['machine_id'])
+        tag_topics = TagTopics.objects.create(
+            name = data['name'], 
+            machine_id = data['machine_id'],
+            line_id = data['line_id'],
+            area_id = data['area_id'],
+            site_id = data['site_id'],
+            value = data['value'],
+            topics = data['topics']
+            )
         serializer = TagTopicsSerializer(tag_topics)
         return Response(serializer.data, status=200)
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            instance.delete()
+            return Response({'message': 'Tags deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting tags', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            print(instance)
+            tagform = TagTopicsForm(request.data)
+            print(tagform.data)
+            if not tagform.is_valid():
+                return Response({'message': 'Error updating tags', 'error': tagform.errors}, status=400)
+            instance.name = request.data['name']
+            instance.machine_id = request.data['machine_id']
+            instance.line_id = request.data['line_id']
+            instance.area_id = request.data['area_id']
+            instance.site_id = request.data['site_id']
+            instance.value = request.data['value']
+            instance.topic = request.data['topic'] 
+            instance.save()
+            if request.data.get('allowed_users', None):
+                instance.allowed_users.clear()
+                for user in self.data['allowed_users']:
+                    instance.allowed_users.add(user)
+                    
+            if request.data.get('admin_users', None):
+                instance.admin_users.clear()
+                for user in self.data['admin_users']:
+                    instance.admin_users.add(user)
+            instance.save()
+            tag = TagTopicsSerializer(instance).data
+            return Response(tag, status=200)
+        except Exception as e:
+            logging.error(f"Error updating machine: {str(e)}")
+            return Response({'message': 'Error updating machine', 'error': str(e)}, status=400)
+    
+        
+                   
+                   
+            
+
     
     
 class MyDashboardViewSet(viewsets.ModelViewSet):

@@ -588,6 +588,14 @@ class ManageProcess(FetchPermissions):
             return Process.objects.get(id=process_id)
         except Exception as e:
             raise Exception(f'Error in getting process by id - {str(e)}')
+        
+    def get_processes_by_line_id(self,line_id):
+        try : 
+            processes = Process.objects.filter(line_id=line_id)
+            serializer = ProcessSerializer(processes, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting processes by_line_id - {str(e)}')
     
     def get_process_choices(self):
         choices = []
@@ -767,6 +775,7 @@ class ManageMachine(FetchPermissions):
                 serial_number=self.data['serial_number'],
                 is_active=True,
                 created_by=self.__get_user()
+                
             )
             
             # if self.data.get('allowed_users', None):
@@ -798,17 +807,40 @@ class ManageMachine(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in mapping machine to process - {str(e)}')
         
-    def update_machine(self, machine, id=None):
+    def update_machines(self, instance):
         try:
-            if id:
-                machine = self.get_machine_instance_by_id(id)
-                machine.save()
-            else:
-                pass
+            instance.name = self.data['name']
+            instance.machine_type = self.data['machine_type']
+            instance.manufacturer = self.data['manufacturer']
+            instance.model_number= self.data['model_number']
+            instance.serial_number = self.data['serial_number']
+            instance.is_active = self.data['is_active']
+            instance.save()
+
+            if self.data.get('allowed_users', None):
+                instance.allowed_users.clear()
+                for user in self.data['allowed_users']:
+                    instance.allowed_users.add(user)
+                    
+            if self.data.get('admin_users', None):
+                instance.admin_users.clear()
+                for user in self.data['admin_users']:
+                    instance.admin_users.add(user)
+                    
+            if self.data.get('machines', None):
+                instance.machines.clear()
+                for machine in self.data['machines']:
+                    instance.machines.add(machine)
+                    
+            instance.save()
+            
+            machine = MachineSerializer(instance).data
+            return machine
+            
         except Exception as e:
-            raise Exception(f'Error in updating machines - {str(e)}')
-        
-        
+            raise Exception(f'Error in updating machine - {str(e)}')
+                 
+
 class ManageOrganization:
     def __init__(self, request):
         self.request = request
