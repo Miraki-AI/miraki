@@ -435,12 +435,12 @@ class TagTopicsViewSet(viewsets.ModelViewSet):
         try:
             tagform = TagTopicsForm(request.data)
             if not tagform.is_valid():
-                return Response({'message': 'Error creating tagtopicsform', 'error': tagform.errors}, status=400)
+                return Response({'message': 'Error creating tagtopics', 'error': tagform.errors}, status=400)
             tag = ManageTagTopics(request).create_tagtopics()
             return Response(tag, status=200)
         except Exception as e:
             logging.error(f"Error creating tagtopics: {str(e)}")
-            return Response({'message': 'Error creating tagtopics exception', 'error': str(e)}, status=400)
+            return Response({'message': 'Error creating tagtopics ', 'error': str(e)}, status=400)
     
     def destroy(self, request, *args, **kwargs):
         try:

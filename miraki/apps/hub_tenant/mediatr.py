@@ -857,27 +857,6 @@ class ManageTagTopics(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in getting tag by id - {str(e)}')
         
-    def get_tags(self, pk=None):
-        try:
-            if pk:
-                tag = self.get_tagtopics_instance_by_id(pk)
-                permissions = self.get_permissions(tag)
-                if (
-                    permissions['is_allowed'] or 
-                    permissions['is_admin'] or 
-                    permissions['is_super_admin']
-                ):
-                    serializer = SiteSerializer(tag)
-                else:
-                    raise Exception('User not allowed to access this site')
-            else:
-                # GetAll tags by User Permission Levels
-                tags = self.permissions.fetch_all_permitted(TagTopics)
-                serializer = TagTopicsSerializer(tags, many=True)
-            return serializer.data
-        except Exception as e:
-            raise Exception(f'Error in getting tags - {str(e)}')
-        
     def create_tagtopics(self):
         try:
             tagtopics = TagTopics(
@@ -895,7 +874,7 @@ class ManageTagTopics(FetchPermissions):
             return serializer.data
         except Exception as e:
             logging.error(f'Error in creating tags - {str(e)}')
-            raise Exception(f'Error in creating tags hii - {str(e)}')
+            raise Exception(f'Error in creating tags - {str(e)}')
     
     def update_tagtopics(self, instance):
         try:
