@@ -152,10 +152,15 @@ class SiteViewSet(viewsets.ModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        site = ManageSite(request).get_site(object_id)
+        return Response(site, status=200)
+    
     def list(self, request, *args, **kwargs):
-        sites = Site.objects.all()
-        serializer = SiteSerializer(sites, many=True)
-        return Response(serializer.data, status=200)
+        sites = ManageSite(request).get_site()
+        return Response(sites, status=200)
     
 
     @extend_schema(
@@ -207,16 +212,38 @@ class SiteViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Site deleted successfully!'}, status=200)
         except Exception as e:
             return Response({'message': 'Error deleting site', 'error': str(e)}, status=400)
-        
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            siteform = SiteForm(request.data)
+            if not siteform.is_valid():
+                return Response({'message': 'Error updating site', 'error': siteform.errors}, status=400)
+            site = ManageSite(request).update_site(instance)
+            return Response(site, status=200)
+        except Exception as e:
+            logging.error(f"Error updating site: {str(e)}")
+            return Response({'message': 'Error updating site', 'error': str(e)}, status=400)
         
 class AreaViewSet(viewsets.ModelViewSet):
     queryset = Area.objects.all()
     serializer_class = AreaSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs.get('pk', None)
+        site_id = request.query_params.get('site_id', None)
+        if object_id:
+            data = ManageArea(request).get_area(object_id)
+        #if query params are passed, then return the filtered data
+        if site_id:
+            data = ManageArea(request).get_areas_by_site_id(site_id)
+        
+        return Response(data, status=200)
+    
     def list(self, request, *args, **kwargs):
-        areas = Area.objects.all()
-        serializer = AreaSerializer(areas, many=True)
-        return Response(serializer.data, status=200)
+        areas = ManageArea(request).get_area()
+        return Response(areas, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -236,15 +263,36 @@ class AreaViewSet(viewsets.ModelViewSet):
             return Response({'message': 'Area deleted successfully!'}, status=200)
         except Exception as e:
             return Response({'message': 'Error deleting area', 'error': str(e)}, status=400)
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            areaform = AreaForm(request.data)
+            if not areaform.is_valid():
+                return Response({'message': 'Error updating area', 'error': areaform.errors}, status=400)
+            area = ManageArea(request).update_area(instance)
+            return Response(area, status=200)
+        except Exception as e:
+            logging.error(f"Error updating area: {str(e)}")
+            return Response({'message': 'Error updating area', 'error': str(e)}, status=400)
     
 class LineViewSet(viewsets.ModelViewSet):
     queryset = Line.objects.all()
     serializer_class = LineSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        area_id = request.query_params.get(area_id,None)
+        if object_id :
+            data = ManageLine(request).get_line(object_id)
+        if area_id:
+            data = ManageLine.get_line_instance_by_id(area_id)
+        return Response(data, status=200)
+    
     def list(self, request, *args, **kwargs):
-        lines = Line.objects.all()
-        serializer = LineSerializer(lines, many=True)
-        return Response(serializer.data, status=200)
+        lines = ManageLine(request).get_line()
+        return Response(lines, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -257,6 +305,18 @@ class LineViewSet(viewsets.ModelViewSet):
             logging.error(f"Error creating line: {str(e)}")
             return Response({'message': 'Error creating line', 'error': str(e)}, status=400)
     
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            lineform = LineForm(request.data)
+            if not lineform.is_valid():
+                return Response({'message': 'Error updating line', 'error': lineform.errors}, status=400)
+            line = ManageLine(request).update_line(instance)
+            return Response(line, status=200)
+        except Exception as e:
+            logging.error(f"Error updating line: {str(e)}")
+            return Response({'message': 'Error updating line', 'error': str(e)}, status=400)
+        
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
@@ -270,10 +330,19 @@ class ProcessViewSet(viewsets.ModelViewSet):
     queryset = Process.objects.all()
     serializer_class = ProcessSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        line_id = request.queryset_params(line_id, None)
+        if object_id:
+            data = ManageProcess(request).get_process(object_id)
+        if line_id :
+            line = ManageProcess.get_processes_by_line_id(line_id)
+        return Response(data, status=200)
+    
     def list(self, request, *args, **kwargs):
-        processes = Process.objects.all()
-        serializer = ProcessSerializer(processes, many=True)
-        return Response(serializer.data, status=200)
+        processes = ManageProcess(request).get_process()
+        return Response(processes, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -285,6 +354,18 @@ class ProcessViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logging.error(f"Error creating process: {str(e)}")
             return Response({'message': 'Error creating process', 'error': str(e)}, status=400)
+        
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            processform = ProcessForm(request.data)
+            if not processform.is_valid():
+                return Response({'message': 'Error updating process', 'error': processform.errors}, status=400)
+            process = ManageProcess(request).update_processes(instance)
+            return Response(process, status=200)
+        except Exception as e:
+            logging.error(f"Error updating process: {str(e)}")
+            return Response({'message': 'Error updating process', 'error': str(e)}, status=400)
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -299,10 +380,15 @@ class MachineViewSet(viewsets.ModelViewSet):
     queryset = Machine.objects.all()
     serializer_class = MachineSerializer
     
+    def retrieve(self, request, *args, **kwargs):
+        # The Primary Key of the object is passed to the retrieve method through self.kwargs
+        object_id = self.kwargs['pk']
+        data = ManageMachine(request).get_machine(object_id)
+        return Response(data, status=200)
+    
     def list(self, request, *args, **kwargs):
-        machines = Machine.objects.all()
-        serializer = MachineSerializer(machines, many=True)
-        return Response(serializer.data, status=200)
+        machines = ManageMachine(request).get_machine()
+        return Response(machines, status=200)
     
     def create(self, request, *args, **kwargs):
         try:
@@ -314,6 +400,27 @@ class MachineViewSet(viewsets.ModelViewSet):
         except Exception as e:
             logging.error(f"Error creating machine: {str(e)}")
             return Response({'message': 'Error creating machine', 'error': str(e)}, status=400)
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageMachine(request).delete_machine(instance)
+            return Response({'message': 'Machine deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting machine', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            machineform = MachineForm(request.data)
+            if not machineform.is_valid():
+                return Response({'message': 'Error updating machine', 'error': machineform.errors}, status=400)
+            machine = ManageMachine(request).update_machines(instance)
+            return Response(machine, status=200)
+        except Exception as e:
+            logging.error(f"Error updating machine: {str(e)}")
+            return Response({'message': 'Error updating machine', 'error': str(e)}, status=400)
+    
 
 class TagTopicsViewSet(viewsets.ModelViewSet):
     queryset = TagTopics.objects.all()
@@ -325,10 +432,86 @@ class TagTopicsViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=200)
     
     def create(self, request, *args, **kwargs):
-        data = request.data
-        logging.info(f"Tag Topics data: {data}")
-        tag_topics = TagTopics.objects.create(name=data['name'], machine_id=data['machine_id'])
-        serializer = TagTopicsSerializer(tag_topics)
-        return Response(serializer.data, status=200)
+        try:
+            tagform = TagTopicsForm(request.data)
+            if not tagform.is_valid():
+                return Response({'message': 'Error creating tagtopics', 'error': tagform.errors}, status=400)
+            tag = ManageTagTopics(request).create_tagtopics()
+            return Response(tag, status=200)
+        except Exception as e:
+            logging.error(f"Error creating tagtopics: {str(e)}")
+            return Response({'message': 'Error creating tagtopics ', 'error': str(e)}, status=400)
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageTagTopics(request).delete_tags(instance)
+            return Response({'message': 'Tags deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting Tags', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            tagform = TagTopicsForm(request.data)
+            if not tagform.is_valid():
+                return Response({'message': 'Error updating tagtopics', 'error': tagform.errors}, status=400)
+            tagtopics = ManageTagTopics(request).update_tagtopics(instance)
+            return Response(tagtopics, status=200)
+        except Exception as e:
+            logging.error(f"Error updating tags: {str(e)}")
+            return Response({'message': 'Error updating tagtopics', 'error': str(e)}, status=400)
+        
+                   
+                   
+            
+
     
     
+class MyDashboardViewSet(viewsets.ModelViewSet):
+    queryset = MyDashboard.objects.all()
+    serializer_class = MyDashboardSerializer
+    
+    def list(self, request, *args, **kwargs):
+        try:
+            mydashboard = ManageMyDashboard(request).get_my_dashboards()
+            return Response(mydashboard, status=200)
+        except MyDashboard.DoesNotExist:
+            return Response({'message': 'No Dashboard not found'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error fetching dashboard', 'error': str(e)}, status=400)
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            mydashboard = ManageMyDashboard(request).create_my_dashboard()
+            return Response(mydashboard, status=200)
+        except Exception as e:
+            return Response({'message': 'Error creating dashboard', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            mydashboard = ManageMyDashboard(request).update_my_dashboard()
+            return Response(mydashboard, status=200)
+        except Exception as e:
+            return Response({'message': 'Error updating dashboard', 'error': str(e)}, status=400)
+        
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageMyDashboard(request).delete_my_dashboard(instance)
+            return Response({'message': 'Dashboard deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting dashboard', 'error': str(e)}, status=400)
+            
+
+# Choices List APi's
+
+class ProcessChoicesView(APIView):
+    def get(self, request, format=None):
+        choices = ManageProcess(request).get_process_choices()
+        return Response(choices, status=200)
+
+class MachineChoicesView(APIView):
+    def get(self, request, format=None):
+        choices = ManageMachine(request).get_machine_choices()
+        return Response(choices, status=200)

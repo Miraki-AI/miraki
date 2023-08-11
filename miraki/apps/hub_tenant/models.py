@@ -66,7 +66,7 @@ class Machine(UserRolesUUIDTimeStampedModel):
     manufacturer = models.CharField(max_length=100)
     model_number = models.CharField(max_length=100)
     serial_number = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(max_length = 100, null = True , blank=True)
     installation_date = models.DateField(auto_now_add=True)
     machine_type = models.CharField(max_length=12, choices=MACHINE_TYPES)
     machine_type_model = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
@@ -145,6 +145,10 @@ class Process(UserRolesUUIDTimeStampedModel):
     next_process = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, related_name='next_process_instance')
     process_type = models.CharField(max_length=100, choices=CHOICES, default=CHOICE_PROCESS_MACHINING)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    line_id = models.UUIDField(null=True, blank=True)
+    area_id = models.UUIDField(null=True, blank=True)
+    site_id = models.UUIDField(null=True, blank=True)
+    description = models.TextField(max_length = 100, null = True , blank=True)
     
     def __str__(self):
         return self.name
@@ -154,6 +158,13 @@ class TagTopics(UserRolesUUIDTimeStampedModel):
     topic = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
     process = models.ForeignKey(Process, on_delete=models.CASCADE, blank=True, null=True)
+    site_id = models.UUIDField(blank=True, null=True)
+    area_id = models.UUIDField(blank=True, null=True)
+    line_id = models.UUIDField(blank=True, null=True)
+    machine_id = models.UUIDField(blank=True, null=True)
+    description = models.TextField(max_length = 100, null = True , blank=True)
+
+
     
     def __str__(self):
         return self.name
@@ -162,12 +173,18 @@ class Line(UserRolesUUIDTimeStampedModel):
     name = models.CharField(max_length=100)
     processes = models.ManyToManyField(Process, blank=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    site_id = models.UUIDField(blank=True, null=True)
+    area_id = models.UUIDField(blank=True, null=True)
+    description = models.TextField(max_length = 100, null = True , blank = True)
     def __str__(self):
         return self.name
+    
 class Area(UserRolesUUIDTimeStampedModel):
     name = models.CharField(max_length=100)
+    site_id = models.UUIDField(blank=True, null=True)
     lines = models.ManyToManyField(Line, blank=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    description = models.TextField(max_length = 100, null = True , blank=True)
     def __str__(self):
         return self.name
  
@@ -182,8 +199,19 @@ class Site(UserRolesUUIDTimeStampedModel):
     longitude = models.CharField(max_length=100, blank=True, null=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     areas = models.ManyToManyField(Area, blank=True)
+    status = models.BooleanField(default=True)
+    description = models.TextField(max_length = 100, null = True , blank = True)
     
     
     def __str__(self):
         return self.name
 
+
+class MyDashboard(UUIDTimeStampedModel):
+    name = models.CharField(max_length=100)
+    is_default = models.BooleanField(default=False)
+    created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    widgets = models.JSONField(default=dict)
+    
+    def __str__(self):
+        return self.name

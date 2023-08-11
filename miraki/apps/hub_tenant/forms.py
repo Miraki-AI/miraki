@@ -1,5 +1,7 @@
 from django import forms
 from miraki.apps.hub_tenant.models import *
+from django.contrib.postgres.fields import ArrayField
+
 
 class InviteUserForm(forms.Form):
     email = forms.EmailField()
@@ -38,11 +40,11 @@ class MachineForm(forms.Form):
     manufacturer = forms.CharField(max_length=100)
     model_number = forms.CharField(max_length=100)
     serial_number = forms.CharField(max_length=100)
-    description = forms.CharField(max_length=100)
+    description = forms.CharField(max_length=100, required=False)
     machine_type = forms.CharField(max_length=100)
     is_active = forms.BooleanField()
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
     process = forms.UUIDField()
 
 class PLCForm(forms.Form):
@@ -78,14 +80,15 @@ class EdgeDeviceForm(forms.Form):
     machine = forms.ModelChoiceField(queryset=Machine.objects.all())
 
 
-
-
-
 class TagTopicsForm(forms.Form):
     name = forms.CharField(max_length=100)
     topic = forms.CharField(max_length=100)
     value = forms.CharField(max_length=100)
-
+    site_id = forms.UUIDField()
+    area_id = forms.UUIDField()
+    line_id = forms.UUIDField()
+    machine_id = forms.UUIDField()
+    description = forms.CharField(max_length = 100, required=False)
 
 class ProcessForm(forms.Form):
     name = forms.CharField(max_length=100)
@@ -93,25 +96,32 @@ class ProcessForm(forms.Form):
     previous_process = forms.ModelChoiceField(queryset=Process.objects.all(), required=False)
     next_process = forms.ModelChoiceField(queryset=Process.objects.all(), required=False)
     process_type = forms.CharField(max_length=100)
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    line = forms.UUIDField()    
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())    
+    line_id = forms.UUIDField()
+    area_id = forms.UUIDField()
+    site_id = forms.UUIDField()
+    description = forms.CharField(max_length=100, required=False)
+    
 
 class LineForm(forms.Form):
     name = forms.CharField(max_length=100)
     processes = forms.ModelMultipleChoiceField(queryset=Process.objects.all(), required=False)
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    area = forms.UUIDField()
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
+    area_id = forms.UUIDField()
+    site_id = forms.UUIDField()
+    description = forms.CharField(max_length=100, required=False)
 
 
 class AreaForm(forms.Form):
     name = forms.CharField(max_length=100)
-    site = forms.UUIDField()
+    site_id = forms.UUIDField()
     lines = forms.ModelMultipleChoiceField(queryset=Line.objects.all(), required=False)
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField()),
+    description = forms.CharField(max_length=100, required=False)
+   
 
 class SiteForm(forms.Form):
     name = forms.CharField(max_length=100)
@@ -120,5 +130,6 @@ class SiteForm(forms.Form):
     zipcode = forms.CharField(max_length=100)
     country = forms.CharField(max_length=100)
     areas = forms.ModelMultipleChoiceField(queryset=Area.objects.all(), required=False)
-    allowed_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
-    admin_users = forms.ModelMultipleChoiceField(queryset=UserProfile.objects.all())
+    allowed_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField())
+    description = forms.CharField(max_length=100)
