@@ -66,7 +66,7 @@ class Machine(UserRolesUUIDTimeStampedModel):
     manufacturer = models.CharField(max_length=100)
     model_number = models.CharField(max_length=100)
     serial_number = models.CharField(max_length=100)
-    description = models.TextField(max_length = 100, default = "")
+    description = models.TextField(max_length = 100, null = True , blank=True)
     installation_date = models.DateField(auto_now_add=True)
     machine_type = models.CharField(max_length=12, choices=MACHINE_TYPES)
     machine_type_model = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
@@ -148,7 +148,7 @@ class Process(UserRolesUUIDTimeStampedModel):
     line_id = models.UUIDField(null=True, blank=True)
     area_id = models.UUIDField(null=True, blank=True)
     site_id = models.UUIDField(null=True, blank=True)
-    description = models.TextField(max_length = 100, default = "")
+    description = models.TextField(max_length = 100, null = True , blank=True)
     
     def __str__(self):
         return self.name
@@ -162,8 +162,8 @@ class TagTopics(UserRolesUUIDTimeStampedModel):
     area_id = models.UUIDField(blank=True, null=True)
     line_id = models.UUIDField(blank=True, null=True)
     machine_id = models.UUIDField(blank=True, null=True)
-    description = models.TextField(max_length = 100, default = "")
-    
+    description = models.TextField(max_length = 100, null = True , blank=True)
+
 
     
     def __str__(self):
@@ -175,7 +175,7 @@ class Line(UserRolesUUIDTimeStampedModel):
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     site_id = models.UUIDField(blank=True, null=True)
     area_id = models.UUIDField(blank=True, null=True)
-    description = models.TextField(max_length = 100, default = "")
+    description = models.TextField(max_length = 100, null = True , blank = True)
     def __str__(self):
         return self.name
     
@@ -184,7 +184,7 @@ class Area(UserRolesUUIDTimeStampedModel):
     site_id = models.UUIDField(blank=True, null=True)
     lines = models.ManyToManyField(Line, blank=True)
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    description = models.TextField(max_length = 100, default = "")
+    description = models.TextField(max_length = 100, null = True , blank=True)
     def __str__(self):
         return self.name
  
@@ -200,7 +200,7 @@ class Site(UserRolesUUIDTimeStampedModel):
     created_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     areas = models.ManyToManyField(Area, blank=True)
     status = models.BooleanField(default=True)
-    description = models.TextField(max_length = 100, default = "")
+    description = models.TextField(max_length = 100, null = True , blank = True)
     
     
     def __str__(self):

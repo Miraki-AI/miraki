@@ -358,10 +358,11 @@ class ManageArea(FetchPermissions):
             area = Area(
                 name=self.data['name'],
                 created_by=self.__get_user(),
-                site_id = self.data['site_id']
-            )
-            
-            area.save()
+                site_id = self.data['site_id'],
+                description = self.data['description']
+            )    
+            area.save()      
+                      
             if self.data.get('allowed_users', None):
                 for user in self.data['allowed_users']:
                     area.allowed_users.add(user)
@@ -393,6 +394,7 @@ class ManageArea(FetchPermissions):
         try:
             instance.name = self.data['name']
             instance.site_id = self.data['site_id']
+            instance.description = self.data['description']
             instance.save()
             
             if self.data.get('allowed_users', None):
@@ -405,10 +407,10 @@ class ManageArea(FetchPermissions):
                 for user in self.data['admin_users']:
                     instance.admin_users.add(user)
                     
-            if self.data.get('lines', None):
-                instance.lines.clear()
-                for line in self.data['lines']:
-                    instance.lines.add(line)
+            if self.data.get('sites', None):
+                instance.areas.clear()
+                for area in self.data['areas']:
+                    instance.areas.add(area)
                     
             instance.save()
             
@@ -417,6 +419,10 @@ class ManageArea(FetchPermissions):
             
         except Exception as e:
             raise Exception(f'Error in updating area - {str(e)}')
+        
+    
+            
+        
             
     
     def _map_area_to_site(self,area):
@@ -494,7 +500,8 @@ class ManageLine(FetchPermissions):
                 name=self.data['name'],
                 created_by=self.__get_user(),
                 area_id = self.data['area_id'],
-                site_id = self.data['site_id']
+                site_id = self.data['site_id'],
+                description = self.data['description']
             )
             
             line.save()
@@ -520,6 +527,7 @@ class ManageLine(FetchPermissions):
             instance.name = self.data['name']
             instance.site_id = self.data['site_id']
             instance.area_id = self.data['area_id']
+            instance.description = self.data['description']
             instance.save()
             
             if self.data.get('allowed_users', None):
@@ -634,7 +642,8 @@ class ManageProcess(FetchPermissions):
                 line_id = self.data['line_id'],
                 area_id = self.data['area_id'],
                 site_id = self.data['site_id'],
-                process_type = self.data['process_type']
+                process_type = self.data['process_type'],
+                description = self.data['description']
             )
             
             process.save()
@@ -663,6 +672,7 @@ class ManageProcess(FetchPermissions):
             instance.site_id = self.data['site_id']
             instance.area_id = self.data['area_id']
             instance.process_type = self.data['process_type']
+            instance.description = self.data['description']
             instance.save()
             
             if self.data.get('allowed_users', None):
@@ -773,6 +783,7 @@ class ManageMachine(FetchPermissions):
                 manufacturer=self.data['manufacturer'],
                 model_number=self.data['model_number'],
                 serial_number=self.data['serial_number'],
+                description = self.data['description'],
                 is_active=True,
                 created_by=self.__get_user()
                 
@@ -815,6 +826,7 @@ class ManageMachine(FetchPermissions):
             instance.model_number= self.data['model_number']
             instance.serial_number = self.data['serial_number']
             instance.is_active = self.data['is_active']
+            instance.description = self.data['description']
             instance.save()
 
             if self.data.get('allowed_users', None):
@@ -866,7 +878,9 @@ class ManageTagTopics(FetchPermissions):
                 site_id = self.data['site_id'],
                 line_id = self.data['line_id'],
                 value = self.data['value'],
-                topic = self.data['topic']              
+                topic = self.data['topic'],
+                description = self.data['description'],
+                # process = self.data['process']              
             )           
             tagtopics.save()
             print(tagtopics)
@@ -885,6 +899,7 @@ class ManageTagTopics(FetchPermissions):
             instance.machine_id = self.data['machine_id']
             instance.value = self.data['value']
             instance.topic = self.data['topic']
+            instance.description = self.data['description']
             instance.save()      
             tags = TagTopicsSerializer(instance).data
             return tags
