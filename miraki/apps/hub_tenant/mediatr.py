@@ -358,10 +358,11 @@ class ManageArea(FetchPermissions):
             area = Area(
                 name=self.data['name'],
                 created_by=self.__get_user(),
-                site_id = self.data['site_id']
-            )
-            
-            area.save()
+                site_id = self.data['site_id'],
+                description = self.data['description']
+            )    
+            area.save()      
+                      
             if self.data.get('allowed_users', None):
                 for user in self.data['allowed_users']:
                     area.allowed_users.add(user)
@@ -393,6 +394,7 @@ class ManageArea(FetchPermissions):
         try:
             instance.name = self.data['name']
             instance.site_id = self.data['site_id']
+            instance.description = self.data['description']
             instance.save()
             
             if self.data.get('allowed_users', None):
@@ -405,10 +407,10 @@ class ManageArea(FetchPermissions):
                 for user in self.data['admin_users']:
                     instance.admin_users.add(user)
                     
-            if self.data.get('lines', None):
-                instance.lines.clear()
-                for line in self.data['lines']:
-                    instance.lines.add(line)
+            if self.data.get('sites', None):
+                instance.areas.clear()
+                for area in self.data['areas']:
+                    instance.areas.add(area)
                     
             instance.save()
             
@@ -417,6 +419,10 @@ class ManageArea(FetchPermissions):
             
         except Exception as e:
             raise Exception(f'Error in updating area - {str(e)}')
+        
+    
+            
+        
             
     
     def _map_area_to_site(self,area):
@@ -494,7 +500,8 @@ class ManageLine(FetchPermissions):
                 name=self.data['name'],
                 created_by=self.__get_user(),
                 area_id = self.data['area_id'],
-                site_id = self.data['site_id']
+                site_id = self.data['site_id'],
+                description = self.data['description']
             )
             
             line.save()
@@ -520,6 +527,7 @@ class ManageLine(FetchPermissions):
             instance.name = self.data['name']
             instance.site_id = self.data['site_id']
             instance.area_id = self.data['area_id']
+            instance.description = self.data['description']
             instance.save()
             
             if self.data.get('allowed_users', None):
@@ -588,6 +596,14 @@ class ManageProcess(FetchPermissions):
             return Process.objects.get(id=process_id)
         except Exception as e:
             raise Exception(f'Error in getting process by id - {str(e)}')
+        
+    def get_processes_by_line_id(self,line_id):
+        try : 
+            processes = Process.objects.filter(line_id=line_id)
+            serializer = ProcessSerializer(processes, many=True)
+            return serializer.data
+        except Exception as e:
+            raise Exception(f'Error in getting processes by_line_id - {str(e)}')
     
     def get_process_choices(self):
         choices = []
@@ -626,7 +642,8 @@ class ManageProcess(FetchPermissions):
                 line_id = self.data['line_id'],
                 area_id = self.data['area_id'],
                 site_id = self.data['site_id'],
-                process_type = self.data['process_type']
+                process_type = self.data['process_type'],
+                description = self.data['description']
             )
             
             process.save()
@@ -641,7 +658,7 @@ class ManageProcess(FetchPermissions):
             process.save()
             print(process)
             process = ProcessSerializer(process).data
-            #Map this area to site requested for creation
+            #Map this process to line requested for creation
             self._map_process_to_line(dict(process))      
             return process
         except Exception as e:
@@ -655,6 +672,7 @@ class ManageProcess(FetchPermissions):
             instance.site_id = self.data['site_id']
             instance.area_id = self.data['area_id']
             instance.process_type = self.data['process_type']
+            instance.description = self.data['description']
             instance.save()
             
             if self.data.get('allowed_users', None):
@@ -765,8 +783,10 @@ class ManageMachine(FetchPermissions):
                 manufacturer=self.data['manufacturer'],
                 model_number=self.data['model_number'],
                 serial_number=self.data['serial_number'],
+                description = self.data['description'],
                 is_active=True,
                 created_by=self.__get_user()
+                
             )
             
             # if self.data.get('allowed_users', None):
@@ -798,17 +818,105 @@ class ManageMachine(FetchPermissions):
         except Exception as e:
             raise Exception(f'Error in mapping machine to process - {str(e)}')
         
-    def update_machine(self, machine, id=None):
+    def update_machines(self, instance):
         try:
-            if id:
-                machine = self.get_machine_instance_by_id(id)
-                machine.save()
-            else:
-                pass
+            instance.name = self.data['name']
+            instance.machine_type = self.data['machine_type']
+            instance.manufacturer = self.data['manufacturer']
+            instance.model_number= self.data['model_number']
+            instance.serial_number = self.data['serial_number']
+            instance.is_active = self.data['is_active']
+            instance.description = self.data['description']
+            instance.save()
+
+            if self.data.get('allowed_users', None):
+                instance.allowed_users.clear()
+                for user in self.data['allowed_users']:
+                    instance.allowed_users.add(user)
+                    
+            if self.data.get('admin_users', None):
+                instance.admin_users.clear()
+                for user in self.data['admin_users']:
+                    instance.admin_users.add(user)
+                    
+            if self.data.get('machines', None):
+                instance.machines.clear()
+                for machine in self.data['machines']:
+                    instance.machines.add(machine)
+                    
+            instance.save()
+            
+            machine = MachineSerializer(instance).data
+            return machine
+            
         except Exception as e:
-            raise Exception(f'Error in updating machines - {str(e)}')
+            raise Exception(f'Error in updating machine - {str(e)}')
+
+class ManageTagTopics(FetchPermissions):
+    def __init__(self, request):
+        self.request = request
+        self.data = request.data
+        self.userprofile = self.__get_user()
+        logging.info(f"Manage TagTopics request: {self.data}")
+        super().__init__(self.userprofile)
+    
+    def __get_user(self):
+        return UserProfile.objects.get(user=self.request.user)
+    
+    def get_tagtopics_instance_by_id(self, tag_id):
+        try:
+            return TagTopics.objects.get(id=tag_id)
+        except Exception as e:
+            raise Exception(f'Error in getting tag by id - {str(e)}')
         
+    def create_tagtopics(self):
+        try:
+            tagtopics = TagTopics(
+                name = self.data['name'], 
+                machine_id = self.data['machine_id'],
+                area_id = self.data['area_id'],
+                site_id = self.data['site_id'],
+                line_id = self.data['line_id'],
+                value = self.data['value'],
+                topic = self.data['topic'],
+                description = self.data['description'],
+                # process = self.data['process']              
+            )           
+            tagtopics.save()
+            print(tagtopics)
+            serializer = TagTopicsSerializer(tagtopics)
+            return serializer.data
+        except Exception as e:
+            logging.error(f'Error in creating tags - {str(e)}')
+            raise Exception(f'Error in creating tags - {str(e)}')
+    
+    def update_tagtopics(self, instance):
+        try:
+            instance.name = self.data['name']
+            instance.line_id = self.data['line_id']
+            instance.site_id = self.data['site_id']
+            instance.area_id = self.data['area_id']
+            instance.machine_id = self.data['machine_id']
+            instance.value = self.data['value']
+            instance.topic = self.data['topic']
+            instance.description = self.data['description']
+            instance.save()      
+            tags = TagTopicsSerializer(instance).data
+            return tags
+            
+        except Exception as e:
+            raise Exception(f'Error in updating tags - {str(e)}')
+    
         
+    def delete_tags(self, instance):
+        try:
+            #check_permissions
+            instance.delete()
+            return True
+        except Exception as e:
+            raise Exception(f'Error in deleting tags - {str(e)}')
+                 
+
 class ManageOrganization:
     def __init__(self, request):
         self.request = request

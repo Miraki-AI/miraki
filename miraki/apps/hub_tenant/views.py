@@ -333,7 +333,11 @@ class ProcessViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         # The Primary Key of the object is passed to the retrieve method through self.kwargs
         object_id = self.kwargs['pk']
-        data = ManageProcess(request).get_process(object_id)
+        line_id = request.queryset_params(line_id, None)
+        if object_id:
+            data = ManageProcess(request).get_process(object_id)
+        if line_id :
+            line = ManageProcess.get_processes_by_line_id(line_id)
         return Response(data, status=200)
     
     def list(self, request, *args, **kwargs):
@@ -397,6 +401,26 @@ class MachineViewSet(viewsets.ModelViewSet):
             logging.error(f"Error creating machine: {str(e)}")
             return Response({'message': 'Error creating machine', 'error': str(e)}, status=400)
     
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageMachine(request).delete_machine(instance)
+            return Response({'message': 'Machine deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting machine', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            machineform = MachineForm(request.data)
+            if not machineform.is_valid():
+                return Response({'message': 'Error updating machine', 'error': machineform.errors}, status=400)
+            machine = ManageMachine(request).update_machines(instance)
+            return Response(machine, status=200)
+        except Exception as e:
+            logging.error(f"Error updating machine: {str(e)}")
+            return Response({'message': 'Error updating machine', 'error': str(e)}, status=400)
+    
 
 class TagTopicsViewSet(viewsets.ModelViewSet):
     queryset = TagTopics.objects.all()
@@ -408,11 +432,40 @@ class TagTopicsViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=200)
     
     def create(self, request, *args, **kwargs):
-        data = request.data
-        logging.info(f"Tag Topics data: {data}")
-        tag_topics = TagTopics.objects.create(name=data['name'], machine_id=data['machine_id'])
-        serializer = TagTopicsSerializer(tag_topics)
-        return Response(serializer.data, status=200)
+        try:
+            tagform = TagTopicsForm(request.data)
+            if not tagform.is_valid():
+                return Response({'message': 'Error creating tagtopics', 'error': tagform.errors}, status=400)
+            tag = ManageTagTopics(request).create_tagtopics()
+            return Response(tag, status=200)
+        except Exception as e:
+            logging.error(f"Error creating tagtopics: {str(e)}")
+            return Response({'message': 'Error creating tagtopics ', 'error': str(e)}, status=400)
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            ManageTagTopics(request).delete_tags(instance)
+            return Response({'message': 'Tags deleted successfully!'}, status=200)
+        except Exception as e:
+            return Response({'message': 'Error deleting Tags', 'error': str(e)}, status=400)
+    
+    def update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            tagform = TagTopicsForm(request.data)
+            if not tagform.is_valid():
+                return Response({'message': 'Error updating tagtopics', 'error': tagform.errors}, status=400)
+            tagtopics = ManageTagTopics(request).update_tagtopics(instance)
+            return Response(tagtopics, status=200)
+        except Exception as e:
+            logging.error(f"Error updating tags: {str(e)}")
+            return Response({'message': 'Error updating tagtopics', 'error': str(e)}, status=400)
+        
+                   
+                   
+            
+
     
     
 class MyDashboardViewSet(viewsets.ModelViewSet):

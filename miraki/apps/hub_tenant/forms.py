@@ -40,7 +40,7 @@ class MachineForm(forms.Form):
     manufacturer = forms.CharField(max_length=100)
     model_number = forms.CharField(max_length=100)
     serial_number = forms.CharField(max_length=100)
-    description = forms.CharField(max_length=100)
+    description = forms.CharField(max_length=100, required=False)
     machine_type = forms.CharField(max_length=100)
     is_active = forms.BooleanField()
     allowed_users = ArrayField(forms.UUIDField())
@@ -80,14 +80,15 @@ class EdgeDeviceForm(forms.Form):
     machine = forms.ModelChoiceField(queryset=Machine.objects.all())
 
 
-
-
-
 class TagTopicsForm(forms.Form):
     name = forms.CharField(max_length=100)
     topic = forms.CharField(max_length=100)
     value = forms.CharField(max_length=100)
-
+    site_id = forms.UUIDField()
+    area_id = forms.UUIDField()
+    line_id = forms.UUIDField()
+    machine_id = forms.UUIDField()
+    description = forms.CharField(max_length = 100, required=False)
 
 class ProcessForm(forms.Form):
     name = forms.CharField(max_length=100)
@@ -100,6 +101,7 @@ class ProcessForm(forms.Form):
     line_id = forms.UUIDField()
     area_id = forms.UUIDField()
     site_id = forms.UUIDField()
+    description = forms.CharField(max_length=100, required=False)
     
 
 class LineForm(forms.Form):
@@ -109,6 +111,7 @@ class LineForm(forms.Form):
     admin_users = ArrayField(forms.UUIDField())
     area_id = forms.UUIDField()
     site_id = forms.UUIDField()
+    description = forms.CharField(max_length=100, required=False)
 
 
 class AreaForm(forms.Form):
@@ -116,7 +119,9 @@ class AreaForm(forms.Form):
     site_id = forms.UUIDField()
     lines = forms.ModelMultipleChoiceField(queryset=Line.objects.all(), required=False)
     allowed_users = ArrayField(forms.UUIDField())
-    admin_users = ArrayField(forms.UUIDField())
+    admin_users = ArrayField(forms.UUIDField()),
+    description = forms.CharField(max_length=100, required=False)
+   
 
 class SiteForm(forms.Form):
     name = forms.CharField(max_length=100)
@@ -127,3 +132,4 @@ class SiteForm(forms.Form):
     areas = forms.ModelMultipleChoiceField(queryset=Area.objects.all(), required=False)
     allowed_users = ArrayField(forms.UUIDField())
     admin_users = ArrayField(forms.UUIDField())
+    description = forms.CharField(max_length=100)
